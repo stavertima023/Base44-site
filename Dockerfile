@@ -8,8 +8,8 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # Копируем файлы зависимостей
-COPY package.json package-lock.json* ./
-RUN npm ci
+COPY package.json package-lock.json ./
+RUN npm ci --only=production
 
 # Пересобираем исходный код только при необходимости
 FROM base AS builder
@@ -27,7 +27,7 @@ WORKDIR /app
 ENV NODE_ENV production
 # Создаем пользователя для безопасности
 RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+RUN adduser --system --uid 1001 nodejs
 
 # Копируем собранное приложение
 COPY --from=builder /app/dist ./dist
@@ -37,8 +37,8 @@ COPY --from=builder /app/package.json ./package.json
 RUN npm ci --only=production && npm cache clean --force
 
 # Меняем владельца файлов
-RUN chown -R nextjs:nodejs /app
-USER nextjs
+RUN chown -R nodejs:nodejs /app
+USER nodejs
 
 # Открываем порт
 EXPOSE 3000
