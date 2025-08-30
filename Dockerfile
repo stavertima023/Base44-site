@@ -9,7 +9,7 @@ WORKDIR /app
 
 # Копируем файлы зависимостей
 COPY package.json package-lock.json ./
-RUN npm ci --only=production
+RUN npm ci
 
 # Пересобираем исходный код только при необходимости
 FROM base AS builder
@@ -32,9 +32,7 @@ RUN adduser --system --uid 1001 nodejs
 # Копируем собранное приложение
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/package.json ./package.json
-
-# Устанавливаем только production зависимости
-RUN npm ci --only=production && npm cache clean --force
+COPY --from=builder /app/node_modules ./node_modules
 
 # Меняем владельца файлов
 RUN chown -R nodejs:nodejs /app
