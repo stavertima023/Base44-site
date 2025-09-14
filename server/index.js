@@ -325,8 +325,31 @@ app.get('*', (req, res) => {
 })
 
 const port = process.env.PORT || 8787
-app.listen(port, () => {
-  console.log(`Server listening on http://localhost:${port}`)
+const server = app.listen(port, '0.0.0.0', () => {
+  console.log(`Server listening on http://0.0.0.0:${port}`)
+})
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully')
+  server.close(() => {
+    console.log('Server closed')
+    pool.end(() => {
+      console.log('Database pool closed')
+      process.exit(0)
+    })
+  })
+})
+
+process.on('SIGINT', () => {
+  console.log('SIGINT received, shutting down gracefully')
+  server.close(() => {
+    console.log('Server closed')
+    pool.end(() => {
+      console.log('Database pool closed')
+      process.exit(0)
+    })
+  })
 })
 
 
