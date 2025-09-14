@@ -6,7 +6,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci --only=production
+RUN npm ci
 
 # Copy source code
 COPY . .
@@ -15,7 +15,7 @@ COPY . .
 RUN npm run build
 
 # Expose port
-EXPOSE 8787
+EXPOSE 8080
 
-# Start the API server
-CMD ["npm", "run", "start"]
+# Start the frontend server
+CMD ["npm", "run", "start:frontend"]

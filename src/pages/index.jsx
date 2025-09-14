@@ -1,24 +1,46 @@
 import Layout from "./Layout.jsx";
 
-import Catalog from "./Catalog";
+import Home from "./Home";
 
-import About from "./About";
+import All from "./All";
 
-import Import from "./Import";
+import New from "./New";
 
-import DeployGuide from "./DeployGuide";
+import Shirts from "./Shirts";
+
+import Hoodie from "./Hoodie";
+
+import Bottoms from "./Bottoms";
+
+import Womens from "./Womens";
+
+import Sale from "./Sale";
+
+import Product from "./Product";
+
+import AdminOrders from "./AdminOrders";
 
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 
 const PAGES = {
     
-    Catalog: Catalog,
+    Home: Home,
     
-    About: About,
+    All: All,
     
-    Import: Import,
+    New: New,
     
-    DeployGuide: DeployGuide,
+    Shirts: Shirts,
+    
+    Hoodie: Hoodie,
+    
+    Bottoms: Bottoms,
+    
+    Womens: Womens,
+    
+    Sale: Sale,
+    
+    Product: Product,
     
 }
 
@@ -44,16 +66,28 @@ function PagesContent() {
         <Layout currentPageName={currentPage}>
             <Routes>            
                 
-                    <Route path="/" element={<Catalog />} />
+                    <Route path="/" element={<Home />} />
                 
                 
-                <Route path="/Catalog" element={<Catalog />} />
+                <Route path="/Home" element={<Home />} />
                 
-                <Route path="/About" element={<About />} />
+                <Route path="/All" element={<All />} />
                 
-                <Route path="/Import" element={<Import />} />
+                <Route path="/New" element={<New />} />
                 
-                <Route path="/DeployGuide" element={<DeployGuide />} />
+                <Route path="/Shirts" element={<Shirts />} />
+                
+                <Route path="/Hoodie" element={<Hoodie />} />
+                
+                <Route path="/Bottoms" element={<Bottoms />} />
+                
+                <Route path="/Womens" element={<Womens />} />
+                
+                <Route path="/Sale" element={<Sale />} />
+                
+                <Route path="/Product" element={<Product />} />
+                
+                <Route path="/admin/orders" element={<AdminOrders />} />
                 
             </Routes>
         </Layout>
