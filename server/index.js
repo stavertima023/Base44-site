@@ -5,6 +5,10 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
+import multer from 'multer'
+import fs from 'fs'
+import slugify from 'slugify'
+import { nanoid } from 'nanoid'
 
 const { Pool } = pg
 const __filename = fileURLToPath(import.meta.url)
@@ -16,6 +20,12 @@ app.use(express.json())
 
 // Serve static files from the dist directory
 app.use(express.static(path.join(__dirname, '../dist')))
+// Serve uploaded files
+const uploadsDir = path.join(__dirname, '../uploads')
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true })
+}
+app.use('/uploads', express.static(uploadsDir))
 
 // JWT secret (in production, use environment variable)
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production'
@@ -218,6 +228,27 @@ app.post('/admin/login', async (req, res) => {
   }
 })
 
+// Multer storage for image uploads
+const storage = multer.diskStorage({
+  destination: (_req, _file, cb) => {
+    cb(null, uploadsDir)
+  },
+  filename: (_req, file, cb) => {
+    const ext = path.extname(file.originalname)
+    const base = path.basename(file.originalname, ext)
+    const safe = slugify(base, { lower: true, strict: true })
+    cb(null, `${safe}-${Date.now()}${ext}`)
+  }
+})
+const upload = multer({ storage })
+
+// Admin image upload
+app.post('/admin/upload', authenticateToken, upload.single('file'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No file uploaded' })
+  const publicUrl = `/uploads/${req.file.filename}`
+  res.status(201).json({ url: publicUrl })
+})
+
 // Categories CRUD
 app.get('/admin/categories', authenticateToken, async (req, res) => {
   try {
@@ -298,13 +329,27 @@ app.get('/admin/products/:id', authenticateToken, async (req, res) => {
 })
 
 app.post('/admin/products', authenticateToken, async (req, res) => {
-  const { sku, title, description, price_cents, currency, stock, is_active, category_id, images, attributes } = req.body
+  const { sku, title, description, price_rub, price_cents, currency, stock, is_active = true, category_id, images = [], attributes = {} } = req.body
   try {
+    // Determine price in cents based on provided rubles or cents
+    const finalPriceCents = Number.isFinite(Number(price_cents)) && Number(price_cents) > 0
+      ? Math.round(Number(price_cents))
+      : Math.round(Number(price_rub) * 100)
+    const finalCurrency = 'RUB'
+
+    // Generate SKU if missing
+    const finalSku = sku && String(sku).trim().length > 0
+      ? sku
+      : `${slugify(title, { lower: true, strict: true })}-${nanoid(6)}`
+
+    // Ensure sizes
+    const finalAttributes = { sizes: ['XS', 'S', 'M', 'L', 'XL'], ...attributes }
+
     const { rows } = await pool.query(`
       INSERT INTO products (sku, title, description, price_cents, currency, stock, is_active, category_id, images, attributes)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      VALUES ($1, $2, $3, $4, $5, COALESCE($6, 0), $7, $8, $9, $10)
       RETURNING *
-    `, [sku, title, description, price_cents, currency, stock, is_active, category_id, JSON.stringify(images), JSON.stringify(attributes)])
+    `, [finalSku, title, description, finalPriceCents, finalCurrency, null, is_active, category_id || null, JSON.stringify(images), JSON.stringify(finalAttributes)])
     res.status(201).json(rows[0])
   } catch (e) {
     console.error(e)
@@ -314,19 +359,56 @@ app.post('/admin/products', authenticateToken, async (req, res) => {
 
 app.put('/admin/products/:id', authenticateToken, async (req, res) => {
   const { id } = req.params
-  const { sku, title, description, price_cents, currency, stock, is_active, category_id, images, attributes } = req.body
+  const { sku, title, description, price_rub, price_cents, currency, stock, is_active, category_id, images = [], attributes = {} } = req.body
   try {
+    const finalPriceCents = Number.isFinite(Number(price_cents)) && Number(price_cents) > 0
+      ? Math.round(Number(price_cents))
+      : (price_rub !== undefined ? Math.round(Number(price_rub) * 100) : null)
+    const finalCurrency = 'RUB'
+    const finalSku = sku && String(sku).trim().length > 0
+      ? sku
+      : `${slugify(title, { lower: true, strict: true })}-${nanoid(6)}`
+    const finalAttributes = { sizes: ['XS', 'S', 'M', 'L', 'XL'], ...attributes }
+
     const { rows } = await pool.query(`
       UPDATE products 
-      SET sku = $1, title = $2, description = $3, price_cents = $4, currency = $5, 
-          stock = $6, is_active = $7, category_id = $8, images = $9, attributes = $10, updated_at = now()
+      SET sku = $1, title = $2, description = $3, price_cents = COALESCE($4, price_cents), currency = $5, 
+          stock = COALESCE($6, stock), is_active = $7, category_id = $8, images = $9, attributes = $10, updated_at = now()
       WHERE id = $11
       RETURNING *
-    `, [sku, title, description, price_cents, currency, stock, is_active, category_id, JSON.stringify(images), JSON.stringify(attributes), id])
+    `, [finalSku, title, description, finalPriceCents, finalCurrency, null, is_active, category_id || null, JSON.stringify(images), JSON.stringify(finalAttributes), id])
     res.json(rows[0])
   } catch (e) {
     console.error(e)
     res.status(500).json({ error: 'Failed to update product' })
+  }
+})
+
+// Public products API
+app.get('/api/products', async (req, res) => {
+  try {
+    const { category, sort } = req.query
+    const values = []
+    let where = 'WHERE is_active = true'
+    if (category) {
+      values.push(category)
+      where += ` AND category_id = (SELECT id FROM categories WHERE slug = $${values.length})`
+    }
+    let orderBy = 'ORDER BY created_at DESC'
+    if (sort === 'alpha') {
+      orderBy = 'ORDER BY title ASC'
+    }
+    const { rows } = await pool.query(`
+      SELECT id, title, price_cents, currency, images, attributes, created_at
+      FROM products
+      ${where}
+      ${orderBy}
+      LIMIT 200
+    `, values)
+    res.json(rows)
+  } catch (e) {
+    console.error(e)
+    res.status(500).json({ error: 'Failed to fetch products' })
   }
 })
 

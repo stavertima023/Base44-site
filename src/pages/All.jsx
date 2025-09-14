@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { ProductService } from "@/components/mockData";
+// Fetch from API instead of mockData
 import ProductGrid from "@/components/ProductGrid";
 
 export default function AllPage() {
@@ -13,8 +13,16 @@ export default function AllPage() {
 
   const loadProducts = async () => {
     try {
-      const data = await ProductService.list("-created_date", 50);
-      setProducts(data);
+      const res = await fetch('/api/products?sort=alpha')
+      const rows = await res.json()
+      const mapped = rows.map(p => ({
+        id: p.id,
+        name: p.title,
+        price: (p.price_cents || 0) / 100,
+        image_url: Array.isArray(p.images) && p.images.length ? p.images[0] : null,
+        category: ''
+      }))
+      setProducts(mapped)
     } catch (error) {
       console.error("Error loading products:", error);
     }

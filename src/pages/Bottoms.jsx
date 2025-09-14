@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { ProductService } from "@/components/mockData";
+// Fetch from API instead of mockData
 import ProductGrid from "@/components/ProductGrid";
 
 export default function BottomsPage() {
@@ -13,8 +13,16 @@ export default function BottomsPage() {
 
   const loadProducts = async () => {
     try {
-      const data = await ProductService.filter({ category: "bottoms" }, "-created_date", 50);
-      setProducts(data);
+      const res = await fetch('/api/products?category=bottoms')
+      const rows = await res.json()
+      const mapped = rows.map(p => ({
+        id: p.id,
+        name: p.title,
+        price: (p.price_cents || 0) / 100,
+        image_url: Array.isArray(p.images) && p.images.length ? p.images[0] : null,
+        category: 'bottoms'
+      }))
+      setProducts(mapped)
     } catch (error) {
       console.error("Error loading products:", error);
     }

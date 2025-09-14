@@ -8,16 +8,13 @@ export default function AdminProducts() {
   const [showForm, setShowForm] = useState(false)
   const [editingProduct, setEditingProduct] = useState(null)
   const [formData, setFormData] = useState({
-    sku: '',
     title: '',
     description: '',
-    price_cents: '',
-    currency: 'USD',
-    stock: '',
+    price_rub: '',
     is_active: true,
     category_id: '',
     images: [],
-    attributes: {}
+    attributes: { sizes: ['XS','S','M','L','XL'] }
   })
   const [imageUrl, setImageUrl] = useState('')
   const navigate = useNavigate()
@@ -66,8 +63,7 @@ export default function AdminProducts() {
         headers,
         body: JSON.stringify({
           ...formData,
-          price_cents: parseInt(formData.price_cents),
-          stock: parseInt(formData.stock)
+          price_rub: parseFloat(formData.price_rub)
         })
       })
 
@@ -96,32 +92,26 @@ export default function AdminProducts() {
   const handleEdit = (product) => {
     setEditingProduct(product)
     setFormData({
-      sku: product.sku,
       title: product.title,
       description: product.description || '',
-      price_cents: product.price_cents,
-      currency: product.currency,
-      stock: product.stock,
+      price_rub: product.price_cents ? (product.price_cents / 100).toFixed(2) : '',
       is_active: product.is_active,
       category_id: product.category_id || '',
       images: product.images || [],
-      attributes: product.attributes || {}
+      attributes: product.attributes?.sizes ? product.attributes : { sizes: ['XS','S','M','L','XL'] }
     })
     setShowForm(true)
   }
 
   const resetForm = () => {
     setFormData({
-      sku: '',
       title: '',
       description: '',
-      price_cents: '',
-      currency: 'USD',
-      stock: '',
+      price_rub: '',
       is_active: true,
       category_id: '',
       images: [],
-      attributes: {}
+      attributes: { sizes: ['XS','S','M','L','XL'] }
     })
     setImageUrl('')
   }
@@ -168,16 +158,7 @@ export default function AdminProducts() {
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">SKU</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.sku}
-                  onChange={(e) => setFormData(prev => ({ ...prev, sku: e.target.value }))}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-                />
-              </div>
+              
               <div>
                 <label className="block text-sm font-medium text-gray-700">Название</label>
                 <input
@@ -189,22 +170,13 @@ export default function AdminProducts() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Цена (в центах)</label>
+                <label className="block text-sm font-medium text-gray-700">Цена (в рублях)</label>
                 <input
                   type="number"
                   required
-                  value={formData.price_cents}
-                  onChange={(e) => setFormData(prev => ({ ...prev, price_cents: e.target.value }))}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Остаток</label>
-                <input
-                  type="number"
-                  required
-                  value={formData.stock}
-                  onChange={(e) => setFormData(prev => ({ ...prev, stock: e.target.value }))}
+                  value={formData.price_rub}
+                  step="0.01"
+                  onChange={(e) => setFormData(prev => ({ ...prev, price_rub: e.target.value }))}
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
                 />
               </div>
@@ -261,6 +233,20 @@ export default function AdminProducts() {
                 >
                   Добавить
                 </button>
+                <label className="bg-gray-100 border px-4 py-2 rounded-md cursor-pointer hover:bg-gray-200">
+                  Загрузить файл
+                  <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                    const file = e.target.files?.[0]
+                    if (!file) return
+                    const form = new FormData()
+                    form.append('file', file)
+                    const res = await fetch('/api/admin/upload', { method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: form })
+                    const data = await res.json()
+                    if (res.ok && data.url) {
+                      setFormData(prev => ({ ...prev, images: [...prev.images, data.url] }))
+                    }
+                  }} />
+                </label>
               </div>
               <div className="mt-2 grid grid-cols-2 md:grid-cols-4 gap-2">
                 {formData.images.map((url, index) => (
