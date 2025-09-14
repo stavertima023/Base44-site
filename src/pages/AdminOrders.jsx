@@ -1,14 +1,30 @@
 import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const navigate = useNavigate()
+
+  const token = localStorage.getItem('adminToken')
+  const headers = {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  }
+
+  useEffect(() => {
+    if (!token) {
+      navigate('/admin/login')
+      return
+    }
+    fetchOrders()
+  }, [token, navigate])
 
   const fetchOrders = async () => {
     setLoading(true)
     try {
-      const res = await fetch('/api/orders')
+      const res = await fetch('/api/orders', { headers })
       const data = await res.json()
       setOrders(data)
     } catch (e) {
@@ -18,17 +34,14 @@ export default function AdminOrders() {
     }
   }
 
-  useEffect(() => {
-    fetchOrders()
-  }, [])
 
   const updateStatus = async (id, status) => {
-    await fetch(`/api/orders/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }) })
+    await fetch(`/api/orders/${id}`, { method: 'PATCH', headers, body: JSON.stringify({ status }) })
     fetchOrders()
   }
 
   const removeOrder = async (id) => {
-    await fetch(`/api/orders/${id}`, { method: 'DELETE' })
+    await fetch(`/api/orders/${id}`, { method: 'DELETE', headers })
     fetchOrders()
   }
 
