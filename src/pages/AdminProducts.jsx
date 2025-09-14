@@ -38,8 +38,8 @@ export default function AdminProducts() {
   const fetchData = async () => {
     try {
       const [productsRes, categoriesRes] = await Promise.all([
-        fetch('/api/admin/products', { headers }),
-        fetch('/api/admin/categories', { headers })
+        fetch('/admin/products', { headers }),
+        fetch('/admin/categories', { headers })
       ])
       
       const productsData = await productsRes.json()
@@ -71,7 +71,7 @@ export default function AdminProducts() {
     }
     try {
       setSaving(true)
-      const url = editingProduct ? `/api/admin/products/${editingProduct.id}` : '/api/admin/products'
+      const url = editingProduct ? `/admin/products/${editingProduct.id}` : '/admin/products'
       const method = editingProduct ? 'PUT' : 'POST'
       
       const response = await fetch(url, {
@@ -104,7 +104,7 @@ export default function AdminProducts() {
     if (!confirm('Удалить товар?')) return
     
     try {
-      await fetch(`/api/admin/products/${id}`, { method: 'DELETE', headers })
+      await fetch(`/admin/products/${id}`, { method: 'DELETE', headers })
       fetchData()
     } catch (e) {
       console.error('Ошибка удаления:', e)
@@ -263,7 +263,7 @@ export default function AdminProducts() {
                     if (!file) return
                     const form = new FormData()
                     form.append('file', file)
-                    const res = await fetch('/api/admin/upload', { method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: form })
+                    const res = await fetch('/admin/upload', { method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: form })
                     const data = await res.json()
                     if (res.ok && data.url) {
                       setFormData(prev => ({ ...prev, images: [...prev.images, data.url] }))

@@ -28,7 +28,7 @@ export default function AdminCategories() {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch('/api/admin/categories', { headers })
+      const res = await fetch('/admin/categories', { headers })
       const data = await res.json()
       setCategories(data)
     } catch (e) {
@@ -41,7 +41,7 @@ export default function AdminCategories() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const url = editingCategory ? `/api/admin/categories/${editingCategory.id}` : '/api/admin/categories'
+      const url = editingCategory ? `/admin/categories/${editingCategory.id}` : '/admin/categories'
       const method = editingCategory ? 'PUT' : 'POST'
       
       const response = await fetch(url, {
@@ -65,7 +65,7 @@ export default function AdminCategories() {
     if (!confirm('Удалить категорию? Все товары в этой категории станут без категории.')) return
     
     try {
-      await fetch(`/api/admin/categories/${id}`, { method: 'DELETE', headers })
+      await fetch(`/admin/categories/${id}`, { method: 'DELETE', headers })
       fetchCategories()
     } catch (e) {
       console.error('Ошибка удаления:', e)

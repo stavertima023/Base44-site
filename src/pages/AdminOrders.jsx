@@ -24,7 +24,7 @@ export default function AdminOrders() {
   const fetchOrders = async () => {
     setLoading(true)
     try {
-      const res = await fetch('/api/orders', { headers })
+      const res = await fetch('/orders', { headers })
       const data = await res.json()
       setOrders(data)
     } catch (e) {
@@ -36,12 +36,12 @@ export default function AdminOrders() {
 
 
   const updateStatus = async (id, status) => {
-    await fetch(`/api/orders/${id}`, { method: 'PATCH', headers, body: JSON.stringify({ status }) })
+    await fetch(`/orders/${id}`, { method: 'PATCH', headers, body: JSON.stringify({ status }) })
     fetchOrders()
   }
 
   const removeOrder = async (id) => {
-    await fetch(`/api/orders/${id}`, { method: 'DELETE', headers })
+    await fetch(`/orders/${id}`, { method: 'DELETE', headers })
     fetchOrders()
   }
 
