@@ -2,12 +2,12 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ProductService, mockProducts } from "../components/mockData";
-import { CartService } from "../components/mockData";
+import { ProductService, mockProducts } from "@/components/mockData";
+import { CartService } from "@/components/mockData";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Minus, MessageCircle, Share2 } from "lucide-react";
-import ProductImageModal from "../components/ProductImageModal";
+import ProductImageModal from "@/components/ProductImageModal";
 
 // A simple card component for the recommended products
 const RecommendedProductCard = ({ product }) => (

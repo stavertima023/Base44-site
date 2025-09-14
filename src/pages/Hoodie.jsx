@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
-import { ProductService } from "../components/mockData";
-import ProductGrid from "../components/ProductGrid";
+import { ProductService } from "@/components/mockData";
+import ProductGrid from "@/components/ProductGrid";
 
 export default function HoodiePage() {
   const [products, setProducts] = useState([]);

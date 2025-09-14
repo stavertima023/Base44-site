@@ -4,10 +4,10 @@ import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Search, User, ShoppingBag, Menu } from "lucide-react";
-import { CartService } from "./components/mockData";
-import SearchModal from "./components/SearchModal";
-import CartSidebar from "./components/CartSidebar";
-import MobileNav from "./components/MobileNav";
+import { CartService } from "@/components/mockData";
+import SearchModal from "@/components/SearchModal";
+import CartSidebar from "@/components/CartSidebar";
+import MobileNav from "@/components/MobileNav";
 
 const navigationItems = [
   { name: "Home", url: createPageUrl("Home") },
