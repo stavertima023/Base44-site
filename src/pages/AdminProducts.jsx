@@ -17,6 +17,8 @@ export default function AdminProducts() {
     attributes: { sizes: ['XS','S','M','L','XL'] }
   })
   const [imageUrl, setImageUrl] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [errorMsg, setErrorMsg] = useState('')
   const navigate = useNavigate()
 
   const token = localStorage.getItem('adminToken')
@@ -54,7 +56,21 @@ export default function AdminProducts() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setErrorMsg('')
+    if (!formData.title.trim()) {
+      setErrorMsg('Введите название товара')
+      return
+    }
+    if (!formData.price_rub || isNaN(Number(formData.price_rub))) {
+      setErrorMsg('Укажите корректную цену в рублях')
+      return
+    }
+    if (!formData.category_id) {
+      setErrorMsg('Выберите категорию')
+      return
+    }
     try {
+      setSaving(true)
       const url = editingProduct ? `/api/admin/products/${editingProduct.id}` : '/api/admin/products'
       const method = editingProduct ? 'PUT' : 'POST'
       
@@ -72,9 +88,15 @@ export default function AdminProducts() {
         setEditingProduct(null)
         resetForm()
         fetchData()
+      } else {
+        const data = await response.json().catch(() => ({}))
+        setErrorMsg(data.error || 'Не удалось сохранить товар')
       }
     } catch (e) {
       console.error('Ошибка сохранения:', e)
+      setErrorMsg('Ошибка соединения с сервером')
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -156,6 +178,7 @@ export default function AdminProducts() {
           <h2 className="text-xl font-semibold mb-4">
             {editingProduct ? 'Редактировать товар' : 'Новый товар'}
           </h2>
+          {errorMsg && (<div className="text-red-600 text-sm mb-2">{errorMsg}</div>)}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               
@@ -248,6 +271,12 @@ export default function AdminProducts() {
                   }} />
                 </label>
               </div>
+              {imageUrl && (
+                <div className="mt-3">
+                  <div className="text-xs text-gray-500 mb-1">Предпросмотр URL</div>
+                  <img src={imageUrl} alt="preview" className="h-32 w-32 object-cover rounded border" onError={(e) => (e.currentTarget.style.display='none')} />
+                </div>
+              )}
               <div className="mt-2 grid grid-cols-2 md:grid-cols-4 gap-2">
                 {formData.images.map((url, index) => (
                   <div key={index} className="relative">
@@ -267,9 +296,10 @@ export default function AdminProducts() {
             <div className="flex gap-2">
               <button
                 type="submit"
-                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
+                disabled={saving}
+                className="bg-green-600 disabled:opacity-50 text-white px-4 py-2 rounded-md hover:bg-green-700"
               >
-                {editingProduct ? 'Обновить' : 'Создать'}
+                {saving ? 'Сохранение…' : (editingProduct ? 'Обновить' : 'Создать')}
               </button>
               <button
                 type="button"

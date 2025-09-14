@@ -65,11 +65,11 @@ export default function ProductGrid({ products, isLoading }) {
             </h3>
             <div className="flex items-center justify-center md:justify-start space-x-2">
               <span className="text-base font-bold text-gray-900">
-                ₽{Math.round(product.price * 90)}
+                ₽{(product.price).toFixed(2)}
               </span>
               {product.original_price && (
                 <span className="text-sm text-gray-500 line-through">
-                  ₽{Math.round(product.original_price * 90)}
+                  ₽{(product.original_price).toFixed(2)}
                 </span>
               )}
             </div>
