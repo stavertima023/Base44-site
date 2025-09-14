@@ -14,8 +14,7 @@ export default function AdminLogin() {
     setError('')
 
     try {
-      // Try simple login first (no database dependency)
-      const res = await fetch('/api/admin/simple-login', {
+      const res = await fetch('/api/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })

@@ -85,20 +85,7 @@ app.get('/health', (_req, res) => {
   })
 })
 
-// Simple admin login endpoint without database dependency
-app.post('/api/admin/simple-login', (req, res) => {
-  const { email, password } = req.body
-  if (email === 'admin@base44.com' && password === 'admin123') {
-    const token = jwt.sign(
-      { id: 'admin', email: 'admin@base44.com', role: 'admin' },
-      JWT_SECRET,
-      { expiresIn: '24h' }
-    )
-    res.json({ token, user: { id: 'admin', email: 'admin@base44.com', role: 'admin' } })
-  } else {
-    res.status(401).json({ error: 'Invalid credentials' })
-  }
-})
+// (removed) simple-login endpoint
 
 // List orders
 app.get('/orders', authenticateToken, async (_req, res) => {
@@ -409,6 +396,19 @@ app.get('/api/products', async (req, res) => {
   } catch (e) {
     console.error(e)
     res.status(500).json({ error: 'Failed to fetch products' })
+  }
+})
+
+// Public product by id
+app.get('/api/products/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+    const { rows } = await pool.query('SELECT * FROM products WHERE id = $1 AND is_active = true', [id])
+    if (rows.length === 0) return res.status(404).json({ error: 'Not found' })
+    res.json(rows[0])
+  } catch (e) {
+    console.error(e)
+    res.status(500).json({ error: 'Failed to fetch product' })
   }
 })
 
