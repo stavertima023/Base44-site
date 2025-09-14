@@ -40,15 +40,31 @@ const authenticateToken = (req, res, next) => {
 
 // API routes
 
-const databaseUrl = process.env.DATABASE_URL
+const databaseUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL
 if (!databaseUrl) {
   console.error('DATABASE_URL is not set')
+  console.error('Available env vars:', Object.keys(process.env).filter(key => key.includes('DATABASE') || key.includes('POSTGRES')))
 }
 
 const pool = new Pool({ 
   connectionString: databaseUrl, 
   ssl: databaseUrl?.includes('proxy.rlwy.net') ? false : { rejectUnauthorized: false }
 })
+
+// Test database connection
+pool.on('error', (err) => {
+  console.error('Unexpected error on idle client', err)
+})
+
+// Test connection on startup
+pool.connect()
+  .then(client => {
+    console.log('✅ Database connected successfully')
+    client.release()
+  })
+  .catch(err => {
+    console.error('❌ Database connection failed:', err.message)
+  })
 
 app.get('/health', (_req, res) => res.json({ ok: true }))
 
