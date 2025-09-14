@@ -45,7 +45,10 @@ if (!databaseUrl) {
   console.error('DATABASE_URL is not set')
 }
 
-const pool = new Pool({ connectionString: databaseUrl, ssl: databaseUrl?.includes('proxy.rlwy.net') ? false : { rejectUnauthorized: false } })
+const pool = new Pool({ 
+  connectionString: databaseUrl, 
+  ssl: databaseUrl?.includes('proxy.rlwy.net') ? false : { rejectUnauthorized: false }
+})
 
 app.get('/health', (_req, res) => res.json({ ok: true }))
 

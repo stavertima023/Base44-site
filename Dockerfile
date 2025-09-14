@@ -20,5 +20,9 @@ RUN npm prune --production
 # Expose port
 EXPOSE 8787
 
+# Set environment variables
+ENV NODE_ENV=production
+ENV PORT=8787
+
 # Start the API server
 CMD ["npm", "run", "start"]
