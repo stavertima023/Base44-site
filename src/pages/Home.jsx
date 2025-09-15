@@ -128,11 +128,13 @@ export default function HomePage() {
       {/* Banner Images */}
       <section className="py-0">
         <div className="w-full">
-          {/* First banner: full width, natural height, highest quality local asset */}
+          {/* First banner: full width, natural height, highest quality external asset */}
           <picture>
-            <source srcSet="/banners/hero-1.jpg" media="(min-width: 1280px)" />
+            <source srcSet="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/25b809fd5_8B6A5940.jpg?quality=100&width=3840" media="(min-width: 1920px)" />
+            <source srcSet="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/25b809fd5_8B6A5940.jpg?quality=100&width=2560" media="(min-width: 1280px)" />
+            <source srcSet="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/25b809fd5_8B6A5940.jpg?quality=100&width=1920" media="(min-width: 768px)" />
             <img
-              src="/banners/hero-1.jpg"
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/25b809fd5_8B6A5940.jpg?quality=100&width=1280"
               alt="GLO GANG Banner 1"
               loading="eager"
               fetchPriority="high"
@@ -140,16 +142,6 @@ export default function HomePage() {
               className="w-full h-auto"
             />
           </picture>
-
-          {bannerImages.map((image, index) => (
-            <div key={index} className="w-full h-[60vh] md:h-[70vh] overflow-hidden">
-              <img
-                src={image}
-                alt={`GLO GANG Banner ${index + 1}`}
-                className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
-              />
-            </div>
-          ))}
         </div>
       </section>
 
