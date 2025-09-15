@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "db:migrate": "node scripts/migrate.js",
+    "db:migrate:glogang": "node scripts/migrate_glogang.js",
     "api": "node server/index.js",
     "dev:all": "concurrently \"npm run api\" \"npm run dev\"",
     "start": "node server/index.js",
