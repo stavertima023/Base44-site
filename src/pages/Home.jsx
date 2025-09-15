@@ -128,20 +128,7 @@ export default function HomePage() {
       {/* Banner Images */}
       <section className="py-0">
         <div className="w-full">
-          {/* First banner: full width, natural height, highest quality external asset */}
-          <picture>
-            <source srcSet="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/25b809fd5_8B6A5940.jpg?quality=100&width=3840" media="(min-width: 1920px)" />
-            <source srcSet="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/25b809fd5_8B6A5940.jpg?quality=100&width=2560" media="(min-width: 1280px)" />
-            <source srcSet="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/25b809fd5_8B6A5940.jpg?quality=100&width=1920" media="(min-width: 768px)" />
-            <img
-              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/25b809fd5_8B6A5940.jpg?quality=100&width=1280"
-              alt="GLO GANG Banner 1"
-              loading="eager"
-              fetchPriority="high"
-              decoding="async"
-              className="w-full h-auto"
-            />
-          </picture>
+          
           {/* Second to fourth banners: external Supabase images, no gaps */}
           <img
             src="https://vqzyvnsyjrfjyczblahz.supabase.co/storage/v1/object/public/images/1757956675196-4vtkmdrrsqs-8B6A5940.jpeg"
