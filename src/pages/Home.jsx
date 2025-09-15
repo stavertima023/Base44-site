@@ -44,6 +44,7 @@ export default function HomePage() {
   ];
 
   const bannerImages = [
+    // Первая фотография — на всю ширину, высота по исходному фото (object-contain), кликабельна
     "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/25b809fd5_8B6A5940.jpg?quality=100&width=1920",
     "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/4bb71aa15_8B6A5935.jpg?quality=100&width=1920",
     "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/300672fa6_8B6A6417.jpg?quality=100&width=1920"
@@ -51,26 +52,14 @@ export default function HomePage() {
 
   return (
     <div>
-      {/* Hero Banner */}
-      <section className="relative h-[70vh] overflow-hidden">
-        <Link to={createPageUrl("New")} className="absolute inset-0 z-10 cursor-pointer">
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+      {/* Hero Banner — первом фото уделяем всю ширину, высота по исходнику, кликабельна */}
+      <section className="relative w-full overflow-hidden">
+        <Link to={createPageUrl("New")} className="block w-full">
           <img
-            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/4f7034733_8B6A6386.jpg?quality=100&width=1920"
-            alt="Glo Gang Collection"
-            className="absolute inset-0 w-full h-full object-cover"
+            src={bannerImages[0]}
+            alt="Hero"
+            className="w-full h-auto object-contain"
           />
-          <div className="absolute bottom-8 left-8">
-            <div className="text-slate-50 mb-4 text-sm font-semibold tracking-wide">
-              Our latest arrival
-            </div>
-            <h1 className="text-3xl md:text-3xl font-black text-white mb-6">
-              Glo Up
-            </h1>
-            <div className="text-white font-semibold hover:underline transition-all duration-200">
-              Shop now
-            </div>
-          </div>
         </Link>
       </section>
       
@@ -105,15 +94,15 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Banner Images */}
+      {/* Остальные баннеры — на всю ширину, высота по фото */}
       <section className="py-0">
         <div className="w-full">
-          {bannerImages.map((image, index) => (
-            <div key={index} className="w-full h-[60vh] md:h-[70vh] overflow-hidden">
+          {bannerImages.slice(1).map((image, index) => (
+            <div key={index} className="w-full overflow-hidden">
               <img
                 src={image}
-                alt={`GLO GANG Banner ${index + 1}`}
-                className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+                alt={`GLO GANG Banner ${index + 2}`}
+                className="w-full h-auto object-contain"
               />
             </div>
           ))}
