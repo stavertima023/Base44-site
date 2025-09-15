@@ -51,9 +51,9 @@ export default function HomePage() {
 
   return (
     <div>
-      {/* Hero Banner - full width, high quality, responsive */}
+      {/* Hero Banner - full width, high quality, with overlay text and button */}
       <section className="relative overflow-hidden">
-        <Link to={createPageUrl("Home")} className="block cursor-pointer" aria-label="Hero">
+        <Link to={createPageUrl("New")} className="block cursor-pointer" aria-label="Hero New Arrivals">
           <picture>
             <source
               srcSet="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/4f7034733_8B6A6386.jpg?quality=100&width=3840"
@@ -76,6 +76,21 @@ export default function HomePage() {
               className="w-full h-auto select-none"
             />
           </picture>
+          {/* Overlay gradient and texts */}
+          <div className="pointer-events-none">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+            <div className="absolute bottom-8 left-8">
+              <div className="text-slate-50 mb-4 text-sm font-semibold tracking-wide">
+                Our latest arrival
+              </div>
+              <h1 className="text-3xl md:text-3xl font-black text-white mb-6">
+                Glo Up
+              </h1>
+              <div className="inline-block text-white font-semibold underline decoration-white/60 decoration-2">
+                Shop now
+              </div>
+            </div>
+          </div>
         </Link>
       </section>
       
