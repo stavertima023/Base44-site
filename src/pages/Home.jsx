@@ -51,14 +51,31 @@ export default function HomePage() {
 
   return (
     <div>
-      {/* Hero Banner - full width and natural height, acts as a button */}
+      {/* Hero Banner - full width, high quality, responsive */}
       <section className="relative overflow-hidden">
         <Link to={createPageUrl("Home")} className="block cursor-pointer" aria-label="Hero">
-          <img
-            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/4f7034733_8B6A6386.jpg"
-            alt="Hero"
-            className="w-full h-auto"
-          />
+          <picture>
+            <source
+              srcSet="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/4f7034733_8B6A6386.jpg?quality=100&width=3840"
+              media="(min-width: 1920px)"
+            />
+            <source
+              srcSet="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/4f7034733_8B6A6386.jpg?quality=100&width=2560"
+              media="(min-width: 1280px)"
+            />
+            <source
+              srcSet="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/4f7034733_8B6A6386.jpg?quality=100&width=1920"
+              media="(min-width: 768px)"
+            />
+            <img
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/4f7034733_8B6A6386.jpg?quality=100&width=1280"
+              alt="Hero"
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
+              className="w-full h-auto select-none"
+            />
+          </picture>
         </Link>
       </section>
       
