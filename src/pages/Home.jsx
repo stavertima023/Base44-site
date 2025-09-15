@@ -104,18 +104,18 @@ export default function HomePage() {
             <div className="bg-slate-50 mx-auto w-24 h-1" />
           </div>
 
-          <div className="flex flex-wrap justify-center gap-6 md:gap-10">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
             {categories.map((category, index) => (
               <Link key={index} to={category.url} className="group">
-                <div className="aspect-square relative overflow-hidden w-52 md:w-72">
+                <div className="aspect-square relative overflow-hidden w-full">
                   <img
                     src={category.image}
                     alt={category.name}
                     className="absolute inset-0 w-full h-full object-cover"
                   />
                 </div>
-                <div className="p-4 md:p-5 text-center">
-                  <h3 className="font-bold text-base md:text-lg text-gray-900 group-hover:text-red-600 transition-colors">
+                <div className="p-3 md:p-4 text-center">
+                  <h3 className="font-bold text-sm md:text-base text-gray-900 group-hover:text-red-600 transition-colors">
                     {category.name}
                   </h3>
                 </div>
