@@ -43,8 +43,8 @@ export default function Layout({ children, currentPageName }) {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <header className="relative z-40 bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-36">
+        <div className="max-w-7xl mx-auto px-0 sm:px-0 lg:px-0 w-full">
+          <div className="grid grid-cols-3 items-center h-36 w-full">
             {/* Mobile Menu Toggle (Left) */}
             <div className="md:hidden">
               <button
@@ -56,7 +56,7 @@ export default function Layout({ children, currentPageName }) {
             </div>
 
             {/* Logo */}
-            <div className="flex-1 flex justify-start -ml-4 sm:-ml-6 lg:-ml-8">
+            <div className="col-span-1 flex justify-start pl-4">
               <Link to={createPageUrl("Home")} className="flex items-center">
                 <img
                   src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/88498d954_Red-Logo.png"
@@ -67,7 +67,7 @@ export default function Layout({ children, currentPageName }) {
             </div>
 
             {/* Navigation */}
-            <nav className="hidden md:flex items-center space-x-10 flex-1 justify-center">
+            <nav className="hidden md:flex col-span-1 items-center justify-center space-x-10">
               {navigationItems.map((item) => (
                 <Link
                   key={item.name}
@@ -84,7 +84,7 @@ export default function Layout({ children, currentPageName }) {
             </nav>
 
             {/* Right Icons */}
-            <div className="flex items-center space-x-5 sm:space-x-7 ml-auto pr-4 sm:pr-6 lg:pr-20 -mr-4 sm:-mr-6 lg:-mr-8">
+            <div className="col-span-1 flex items-center justify-end space-x-5 sm:space-x-7 pr-4 sm:pr-6 lg:pr-8">
               <button
                 onClick={() => setIsSearchOpen(true)}
                 className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
