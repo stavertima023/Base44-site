@@ -76,6 +76,20 @@ export default function HomePage() {
               className="w-full h-auto select-none"
             />
           </picture>
+
+          {/* Third banner (immediately after the first), full width */}
+          <div className="mt-2">
+            <picture>
+              <source srcSet="/banners/hero-3.jpg" media="(min-width: 1280px)" />
+              <img
+                src="/banners/hero-3.jpg"
+                alt="GLO GANG Banner 3"
+                loading="lazy"
+                decoding="async"
+                className="w-full h-auto"
+              />
+            </picture>
+          </div>
           {/* Overlay gradient and texts */}
           <div className="pointer-events-none">
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
