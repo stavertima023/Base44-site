@@ -76,20 +76,6 @@ export default function HomePage() {
               className="w-full h-auto select-none"
             />
           </picture>
-
-          {/* Third banner (immediately after the first), full width */}
-          <div className="mt-2">
-            <picture>
-              <source srcSet="/banners/hero-3.jpg" media="(min-width: 1280px)" />
-              <img
-                src="/banners/hero-3.jpg"
-                alt="GLO GANG Banner 3"
-                loading="lazy"
-                decoding="async"
-                className="w-full h-auto"
-              />
-            </picture>
-          </div>
           {/* Overlay gradient and texts */}
           <div className="pointer-events-none">
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
@@ -156,6 +142,35 @@ export default function HomePage() {
               className="w-full h-auto"
             />
           </picture>
+          {/* Second banner: same dimensions; place your file at public/banners/hero-2.jpg */}
+          <div className="mt-2">
+            <picture>
+              <source srcSet="/banners/hero-2.jpg" media="(min-width: 1280px)" />
+              <img
+                src="/banners/hero-2.jpg"
+                alt="GLO GANG Banner 2"
+                loading="lazy"
+                decoding="async"
+                className="w-full h-auto"
+              />
+            </picture>
+          </div>
+
+          <div className="mt-2">
+            <picture>
+              <source srcSet="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/300672fa6_8B6A6417.jpg?quality=100&width=3840" media="(min-width: 1920px)" />
+              <source srcSet="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/300672fa6_8B6A6417.jpg?quality=100&width=2560" media="(min-width: 1280px)" />
+              <source srcSet="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/300672fa6_8B6A6417.jpg?quality=100&width=1920" media="(min-width: 768px)" />
+              <img
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/300672fa6_8B6A6417.jpg?quality=100&width=1280"
+                alt="GLO GANG Banner 3"
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
+                className="w-full h-auto"
+              />
+            </picture>
+          </div>
         </div>
       </section>
 
