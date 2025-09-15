@@ -3,8 +3,10 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { ArrowRight } from "lucide-react";
+import useScrollReveal from "@/hooks/useScrollReveal";
 
 export default function HomePage() {
+  useScrollReveal();
   const categories = [
     {
       name: "New Arrivals",
@@ -95,16 +97,16 @@ export default function HomePage() {
       </section>
       
       {/* Shop by Category */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white reveal">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <div className="text-center mb-16 reveal reveal-delay-1">
             <h2 className="text-2xl md:text-2xl font-black text-gray-900 mb-4">
               SHOP BY CATEGORY
             </h2>
             <div className="bg-slate-50 mx-auto w-24 h-1" />
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6 reveal reveal-delay-2">
             {categories.map((category, index) => (
               <Link key={index} to={category.url} className="group">
                 <div className="aspect-square relative overflow-hidden w-full">
@@ -126,7 +128,7 @@ export default function HomePage() {
       </section>
 
       {/* Banner Images */}
-      <section className="py-0">
+      <section className="py-0 reveal">
         <div className="w-full">
           
           {/* Second to fourth banners: external Supabase images, no gaps */}
