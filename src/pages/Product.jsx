@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ProductService, mockProducts } from "@/components/mockData";
 import { CartService } from "@/components/mockData";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -27,7 +26,7 @@ const RecommendedProductCard = ({ product }) => (
         {product.name}
       </h3>
       <span className="text-sm font-bold text-gray-900">
-        ₽{Math.round(product.price * 90)}
+        ₽{(product.price).toFixed(2)}
       </span>
     </div>
   </Link>
@@ -48,28 +47,45 @@ export default function ProductPage() {
   useEffect(() => {
     const loadProduct = async () => {
       try {
-        const foundProduct = mockProducts.find(p => p.id === productId);
-        setProduct(foundProduct);
+        const res = await fetch(`/api/products/${productId}`)
+        if (!res.ok) throw new Error('Failed to load product')
+        const p = await res.json()
+        const mapped = {
+          id: p.id,
+          name: p.title,
+          description: p.description,
+          price: (p.price_cents || 0) / 100,
+          image_url: Array.isArray(p.images) && p.images.length ? p.images[0] : null,
+          attributes: p.attributes || { sizes: ['XS','S','M','L','XL'] }
+        }
+        setProduct(mapped)
       } catch (error) {
-        console.error("Error loading product:", error);
+        console.error("Error loading product:", error)
       }
-      setIsLoading(false);
-    };
+      setIsLoading(false)
+    }
 
     const loadRecommendedProducts = async () => {
       try {
-        const products = await ProductService.list("-created_date", 10);
-        setRecommendedProducts(products);
+        const res = await fetch('/api/products?sort=alpha')
+        const rows = await res.json()
+        const mapped = rows.slice(0, 10).map(p => ({
+          id: p.id,
+          name: p.title,
+          price: (p.price_cents || 0) / 100,
+          image_url: Array.isArray(p.images) && p.images.length ? p.images[0] : null,
+        }))
+        setRecommendedProducts(mapped)
       } catch (error) {
-        console.error("Error loading recommended products:", error);
+        console.error("Error loading recommended products:", error)
       }
-    };
+    }
 
     if (productId) {
-      loadProduct();
-      loadRecommendedProducts();
+      loadProduct()
+      loadRecommendedProducts()
     }
-  }, [productId]);
+  }, [productId])
 
   const handleAddToCart = async () => {
     setIsAddingToCart(true);
@@ -158,7 +174,7 @@ export default function ProductPage() {
               </h1>
               <div className="flex items-center space-x-2 mb-6">
                 <span className="text-2xl font-bold text-gray-900">
-                  ₽{Math.round(product.price * 90)}
+                  ₽{(product.price).toFixed(2)}
                 </span>
                 {product.original_price && (
                   <span className="text-lg text-gray-500 line-through">
