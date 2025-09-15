@@ -56,7 +56,7 @@ export default function Layout({ children, currentPageName }) {
             </div>
 
             {/* Logo */}
-            <div className="flex-1 md:flex-none flex justify-center md:justify-start">
+            <div className="flex-1 flex justify-start">
               <Link to={createPageUrl("Home")} className="flex items-center">
                 <img
                   src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/88498d954_Red-Logo.png"
@@ -67,12 +67,12 @@ export default function Layout({ children, currentPageName }) {
             </div>
 
             {/* Navigation */}
-            <nav className="hidden md:flex items-center space-x-8">
+            <nav className="hidden md:flex items-center space-x-10 flex-1 justify-center">
               {navigationItems.map((item) => (
                 <Link
                   key={item.name}
                   to={item.url}
-                  className={`text-sm font-medium transition-colors duration-200 ${
+                  className={`text-base md:text-lg font-semibold transition-colors duration-200 ${
                     location.pathname === item.url
                       ? "text-red-600"
                       : "text-gray-900 hover:text-red-600"
@@ -84,7 +84,7 @@ export default function Layout({ children, currentPageName }) {
             </nav>
 
             {/* Right Icons */}
-            <div className="flex items-center space-x-2 sm:space-x-4">
+            <div className="flex items-center space-x-4 sm:space-x-6 ml-auto pr-2 sm:pr-4 lg:pr-10">
               <button
                 onClick={() => setIsSearchOpen(true)}
                 className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
