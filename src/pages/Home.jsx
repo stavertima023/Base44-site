@@ -142,35 +142,28 @@ export default function HomePage() {
               className="w-full h-auto"
             />
           </picture>
-          {/* Second banner: same dimensions; place your file at public/banners/hero-2.jpg */}
-          <div className="mt-2">
-            <picture>
-              <source srcSet="/banners/hero-2.jpg" media="(min-width: 1280px)" />
-              <img
-                src="/banners/hero-2.jpg"
-                alt="GLO GANG Banner 2"
-                loading="lazy"
-                decoding="async"
-                className="w-full h-auto"
-              />
-            </picture>
-          </div>
-
-          <div className="mt-2">
-            <picture>
-              <source srcSet="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/300672fa6_8B6A6417.jpg?quality=100&width=3840" media="(min-width: 1920px)" />
-              <source srcSet="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/300672fa6_8B6A6417.jpg?quality=100&width=2560" media="(min-width: 1280px)" />
-              <source srcSet="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/300672fa6_8B6A6417.jpg?quality=100&width=1920" media="(min-width: 768px)" />
-              <img
-                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/300672fa6_8B6A6417.jpg?quality=100&width=1280"
-                alt="GLO GANG Banner 3"
-                loading="eager"
-                fetchPriority="high"
-                decoding="async"
-                className="w-full h-auto"
-              />
-            </picture>
-          </div>
+          {/* Second to fourth banners: external Supabase images, no gaps */}
+          <img
+            src="https://vqzyvnsyjrfjyczblahz.supabase.co/storage/v1/object/public/images/1757956675196-4vtkmdrrsqs-8B6A5940.jpeg"
+            alt="GLO GANG Banner 2"
+            loading="lazy"
+            decoding="async"
+            className="w-full h-auto block"
+          />
+          <img
+            src="https://vqzyvnsyjrfjyczblahz.supabase.co/storage/v1/object/public/images/1757956686265-w3euv64nlo-3.png"
+            alt="GLO GANG Banner 3"
+            loading="lazy"
+            decoding="async"
+            className="w-full h-auto block"
+          />
+          <img
+            src="https://vqzyvnsyjrfjyczblahz.supabase.co/storage/v1/object/public/images/1757956693023-luzoa81pcgq-4.png"
+            alt="GLO GANG Banner 4"
+            loading="lazy"
+            decoding="async"
+            className="w-full h-auto block"
+          />
         </div>
       </section>
 
