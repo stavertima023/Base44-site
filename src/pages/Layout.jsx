@@ -10,7 +10,6 @@ import CartSidebar from "@/components/CartSidebar";
 import MobileNav from "@/components/MobileNav";
 
 const navigationItems = [
-  // Home удалён — роль кнопки Домой выполняет логотип
   { name: "All", url: createPageUrl("All") },
   { name: "New", url: createPageUrl("New") },
   { name: "Shirts", url: createPageUrl("Shirts") },
@@ -45,7 +44,7 @@ export default function Layout({ children, currentPageName }) {
     <div className="min-h-screen bg-white flex flex-col">
       <header className="relative z-40 bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-40">
+          <div className="flex justify-between items-center h-36">
             {/* Mobile Menu Toggle (Left) */}
             <div className="md:hidden">
               <button
@@ -56,13 +55,13 @@ export default function Layout({ children, currentPageName }) {
               </button>
             </div>
 
-            {/* Logo — кнопка Домой слева, увеличен в 3 раза */}
-            <div className="flex-1 md:flex-none flex justify-start">
+            {/* Logo */}
+            <div className="flex-1 md:flex-none flex justify-center md:justify-start">
               <Link to={createPageUrl("Home")} className="flex items-center">
                 <img
                   src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/88498d954_Red-Logo.png"
                   alt="GLO GANG"
-                  className="h-[10.5rem] w-auto hover:opacity-80 transition-opacity duration-200"
+                  className="h-28 w-auto hover:opacity-80 transition-opacity duration-200"
                 />
               </Link>
             </div>

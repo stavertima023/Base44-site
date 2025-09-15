@@ -44,7 +44,6 @@ export default function HomePage() {
   ];
 
   const bannerImages = [
-    // Первая фотография — на всю ширину, высота по исходному фото (object-contain), кликабельна
     "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/25b809fd5_8B6A5940.jpg?quality=100&width=1920",
     "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/4bb71aa15_8B6A5935.jpg?quality=100&width=1920",
     "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/300672fa6_8B6A6417.jpg?quality=100&width=1920"
@@ -52,13 +51,13 @@ export default function HomePage() {
 
   return (
     <div>
-      {/* Hero Banner — первом фото уделяем всю ширину, высота по исходнику, кликабельна */}
-      <section className="relative w-full overflow-hidden">
-        <Link to={createPageUrl("New")} className="block w-full">
+      {/* Hero Banner - full width and natural height, acts as a button */}
+      <section className="relative overflow-hidden">
+        <Link to={createPageUrl("Home")} className="block cursor-pointer" aria-label="Hero">
           <img
-            src={bannerImages[0]}
+            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/4f7034733_8B6A6386.jpg"
             alt="Hero"
-            className="w-full h-auto object-contain"
+            className="w-full h-auto"
           />
         </Link>
       </section>
@@ -94,15 +93,15 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Остальные баннеры — на всю ширину, высота по фото */}
+      {/* Banner Images */}
       <section className="py-0">
         <div className="w-full">
-          {bannerImages.slice(1).map((image, index) => (
-            <div key={index} className="w-full overflow-hidden">
+          {bannerImages.map((image, index) => (
+            <div key={index} className="w-full h-[60vh] md:h-[70vh] overflow-hidden">
               <img
                 src={image}
-                alt={`GLO GANG Banner ${index + 2}`}
-                className="w-full h-auto object-contain"
+                alt={`GLO GANG Banner ${index + 1}`}
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
               />
             </div>
           ))}
