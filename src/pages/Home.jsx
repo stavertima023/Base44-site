@@ -128,6 +128,19 @@ export default function HomePage() {
       {/* Banner Images */}
       <section className="py-0">
         <div className="w-full">
+          {/* First banner: full width, natural height, highest quality local asset */}
+          <picture>
+            <source srcSet="/banners/hero-1.jpg" media="(min-width: 1280px)" />
+            <img
+              src="/banners/hero-1.jpg"
+              alt="GLO GANG Banner 1"
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
+              className="w-full h-auto"
+            />
+          </picture>
+
           {bannerImages.map((image, index) => (
             <div key={index} className="w-full h-[60vh] md:h-[70vh] overflow-hidden">
               <img
