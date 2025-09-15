@@ -56,7 +56,7 @@ export default function Layout({ children, currentPageName }) {
             </div>
 
             {/* Logo */}
-            <div className="flex-1 flex justify-start">
+            <div className="flex-1 flex justify-start -ml-4 sm:-ml-6 lg:-ml-8">
               <Link to={createPageUrl("Home")} className="flex items-center">
                 <img
                   src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/88498d954_Red-Logo.png"
@@ -84,7 +84,7 @@ export default function Layout({ children, currentPageName }) {
             </nav>
 
             {/* Right Icons */}
-            <div className="flex items-center space-x-4 sm:space-x-6 ml-auto pr-2 sm:pr-4 lg:pr-10">
+            <div className="flex items-center space-x-5 sm:space-x-7 ml-auto pr-4 sm:pr-6 lg:pr-20 -mr-4 sm:-mr-6 lg:-mr-8">
               <button
                 onClick={() => setIsSearchOpen(true)}
                 className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
