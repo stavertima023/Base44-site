@@ -16,7 +16,7 @@ const navigationItems = [
   { name: "Hoodies", url: createPageUrl("Hoodie") },
   { name: "Bottoms", url: createPageUrl("Bottoms") },
   { name: "Womens", url: createPageUrl("Womens") },
-  { name: "Sale", url: createPageUrl("Sale") },
+  { name: "Sale", url: "/sale" },
 ];
 
 
