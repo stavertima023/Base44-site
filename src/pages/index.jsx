@@ -90,6 +90,7 @@ function PagesContent() {
                 <Route path="/Womens" element={<Womens />} />
                 
                 <Route path="/Sale" element={<Sale />} />
+                <Route path="/sale" element={<Sale />} />
                 
                 <Route path="/Product" element={<Product />} />
                 

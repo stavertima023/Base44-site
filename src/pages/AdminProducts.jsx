@@ -18,6 +18,7 @@ export default function AdminProducts() {
     attributes: { sizes: ['XS','S','M','L','XL'] }
   })
   const [imageUrl, setImageUrl] = useState('')
+  const [editImageUrl, setEditImageUrl] = useState('')
   const [saving, setSaving] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
   const [listCategory, setListCategory] = useState('all')
@@ -115,7 +116,17 @@ export default function AdminProducts() {
   }
 
   const handleEdit = (product) => {
-    window.location.href = `/admin/products/edit?id=${product.id}`
+    setEditingProduct(product)
+    setFormData({
+      title: product.title,
+      description: product.description || '',
+      price_rub: product.price_cents ? (product.price_cents / 100).toFixed(2) : '',
+      is_active: product.is_active,
+      category_id: product.category_id || '',
+      category_ids: [],
+      images: product.images || [],
+      attributes: product.attributes?.sizes ? product.attributes : { sizes: ['XS','S','M','L','XL'] }
+    })
   }
 
   const resetForm = () => {
@@ -147,6 +158,36 @@ export default function AdminProducts() {
       ...prev,
       images: prev.images.filter((_, i) => i !== index)
     }))
+  }
+
+  const saveInlineEdit = async (e) => {
+    e.preventDefault()
+    if (!editingProduct) return
+    setSaving(true)
+    setErrorMsg('')
+    try {
+      const res = await fetch(`/admin/products/${editingProduct.id}`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({
+          ...formData,
+          price_rub: parseFloat(formData.price_rub)
+        })
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        setErrorMsg(data.error || 'Не удалось сохранить изменения')
+      } else {
+        setEditingProduct(null)
+        setEditImageUrl('')
+        fetchData()
+      }
+    } catch (e) {
+      console.error('Ошибка сохранения:', e)
+      setErrorMsg('Ошибка соединения с сервером')
+    } finally {
+      setSaving(false)
+    }
   }
 
   if (loading) return <div className="p-6">Загрузка...</div>
@@ -379,6 +420,111 @@ export default function AdminProducts() {
                   </button>
                 </div>
               </div>
+
+              {/* Inline edit block */}
+              {editingProduct && editingProduct.id === product.id && (
+                <div className="mt-4 border-t pt-4">
+                  {errorMsg && (<div className="text-red-600 text-sm mb-2">{errorMsg}</div>)}
+                  <form onSubmit={saveInlineEdit} className="space-y-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700">Название</label>
+                        <input
+                          type="text"
+                          required
+                          value={formData.title}
+                          onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700">Цена (в рублях)</label>
+                        <input
+                          type="number"
+                          required
+                          value={formData.price_rub}
+                          step="0.01"
+                          onChange={(e) => setFormData(prev => ({ ...prev, price_rub: e.target.value }))}
+                          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700">Категория (основная)</label>
+                        <select
+                          value={formData.category_id}
+                          onChange={(e) => setFormData(prev => ({ ...prev, category_id: e.target.value }))}
+                          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                        >
+                          <option value="">Выберите категорию</option>
+                          {categories.map(cat => (
+                            <option key={cat.id} value={cat.id}>{cat.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700">Статус</label>
+                        <select
+                          value={formData.is_active}
+                          onChange={(e) => setFormData(prev => ({ ...prev, is_active: e.target.value === 'true' }))}
+                          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                        >
+                          <option value={true}>Активен</option>
+                          <option value={false}>Неактивен</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700">Описание</label>
+                      <textarea
+                        value={formData.description}
+                        onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                        rows={3}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700">Изображения</label>
+                      <div className="mt-2 flex gap-2">
+                        <input
+                          type="url"
+                          value={editImageUrl}
+                          onChange={(e) => setEditImageUrl(e.target.value)}
+                          placeholder="URL изображения"
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => { if (editImageUrl.trim()) { setFormData(prev=>({ ...prev, images:[...prev.images, editImageUrl.trim()] })); setEditImageUrl('') } }}
+                          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                        >
+                          Добавить
+                        </button>
+                      </div>
+                      <div className="mt-2 grid grid-cols-2 md:grid-cols-4 gap-2">
+                        {formData.images.map((url, index) => (
+                          <div key={index} className="relative">
+                            <img src={url} alt={`Product ${index + 1}`} className="w-full h-24 object-cover rounded" />
+                            <button
+                              type="button"
+                              onClick={() => removeImage(index)}
+                              className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 text-xs"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <button type="submit" disabled={saving} className="bg-green-600 disabled:opacity-50 text-white px-4 py-2 rounded-md hover:bg-green-700">{saving ? 'Сохранение…' : 'Сохранить'}</button>
+                      <button type="button" onClick={()=>{ setEditingProduct(null); setErrorMsg('') }} className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">Отмена</button>
+                    </div>
+                  </form>
+                </div>
+              )}
             </li>
           ))}
         </ul>
