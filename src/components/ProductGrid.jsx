@@ -6,12 +6,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import useScrollReveal from "@/hooks/useScrollReveal";
 
 function GridItem({ product, index }) {
-  const [ref, isVisible] = useScrollReveal();
   return (
     <div
-      ref={ref}
-      className={`reveal ${isVisible ? 'revealed' : ''}`}
-      style={{ "--reveal-delay": `${Math.min(index, 20) * 60}ms` }}
+      className="reveal"
+      style={{ '--reveal-delay': `${Math.min(index, 20) * 60}ms` }}
     >
       <Link
         to={`${createPageUrl("Product")}?id=${product.id}`}
@@ -72,6 +70,8 @@ function GridItem({ product, index }) {
 }
 
 export default function ProductGrid({ products, isLoading }) {
+  // initialize global intersection observer for `.reveal` elements
+  useScrollReveal()
   if (isLoading) {
     return (
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 gap-y-8 md:gap-8">
