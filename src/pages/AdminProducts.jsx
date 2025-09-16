@@ -115,18 +115,47 @@ export default function AdminProducts() {
     }
   }
 
-  const handleEdit = (product) => {
+  const handleEdit = async (product) => {
     setEditingProduct(product)
-    setFormData({
-      title: product.title,
-      description: product.description || '',
-      price_rub: product.price_cents ? (product.price_cents / 100).toFixed(2) : '',
-      is_active: product.is_active,
-      category_id: product.category_id || '',
-      category_ids: [],
-      images: product.images || [],
-      attributes: product.attributes?.sizes ? product.attributes : { sizes: ['XS','S','M','L','XL'] }
-    })
+    try {
+      const res = await fetch(`/admin/products/${product.id}`, { headers })
+      if (res.ok) {
+        const full = await res.json()
+        setFormData({
+          title: full.title,
+          description: full.description || '',
+          price_rub: full.price_cents ? (full.price_cents / 100).toFixed(2) : '',
+          is_active: full.is_active,
+          category_id: full.category_id || '',
+          category_ids: Array.isArray(full.category_ids) ? full.category_ids : [],
+          images: full.images || [],
+          attributes: full.attributes?.sizes ? full.attributes : { sizes: ['XS','S','M','L','XL'] }
+        })
+      } else {
+        // fallback to list data if detailed fetch fails
+        setFormData({
+          title: product.title,
+          description: product.description || '',
+          price_rub: product.price_cents ? (product.price_cents / 100).toFixed(2) : '',
+          is_active: product.is_active,
+          category_id: product.category_id || '',
+          category_ids: [],
+          images: product.images || [],
+          attributes: product.attributes?.sizes ? product.attributes : { sizes: ['XS','S','M','L','XL'] }
+        })
+      }
+    } catch {
+      setFormData({
+        title: product.title,
+        description: product.description || '',
+        price_rub: product.price_cents ? (product.price_cents / 100).toFixed(2) : '',
+        is_active: product.is_active,
+        category_id: product.category_id || '',
+        category_ids: [],
+        images: product.images || [],
+        attributes: product.attributes?.sizes ? product.attributes : { sizes: ['XS','S','M','L','XL'] }
+      })
+    }
   }
 
   const resetForm = () => {
@@ -460,6 +489,27 @@ export default function AdminProducts() {
                             <option key={cat.id} value={cat.id}>{cat.name}</option>
                           ))}
                         </select>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700">Доп. категории</label>
+                        <div className="mt-2 grid grid-cols-2 gap-2 max-h-28 overflow-auto border rounded-md p-2">
+                          {categories.map(cat => (
+                            <label key={cat.id} className="flex items-center gap-2 text-sm">
+                              <input
+                                type="checkbox"
+                                checked={formData.category_ids.includes(cat.id)}
+                                onChange={(e)=>{
+                                  setFormData(prev=>{
+                                    const set = new Set(prev.category_ids)
+                                    if(e.target.checked) set.add(cat.id); else set.delete(cat.id)
+                                    return { ...prev, category_ids: Array.from(set) }
+                                  })
+                                }}
+                              />
+                              {cat.name}
+                            </label>
+                          ))}
+                        </div>
                       </div>
                       <div>
                         <label className="block text-xs font-medium text-gray-700">Статус</label>
