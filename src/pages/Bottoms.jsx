@@ -21,6 +21,7 @@ export default function BottomsPage() {
         name: p.title,
         price: (p.price_cents || 0) / 100,
         image_url: Array.isArray(p.images) && p.images.length ? p.images[0] : null,
+        images: Array.isArray(p.images) ? p.images : [],
         category: 'bottoms'
       }))
       setProducts(mapped)
