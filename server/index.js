@@ -333,7 +333,13 @@ app.get('/admin/products', authenticateToken, async (req, res) => {
 app.get('/admin/products/:id', authenticateToken, async (req, res) => {
   const { id } = req.params
   try {
-    const { rows } = await pool.query('SELECT * FROM products WHERE id = $1', [id])
+    const { rows } = await pool.query(`
+      SELECT p.*, COALESCE(array_agg(pc.category_id) FILTER (WHERE pc.category_id IS NOT NULL), '{}') AS category_ids
+      FROM products p
+      LEFT JOIN product_categories pc ON pc.product_id = p.id
+      WHERE p.id = $1
+      GROUP BY p.id
+    `, [id])
     if (rows.length === 0) return res.status(404).json({ error: 'Product not found' })
     res.json(rows[0])
   } catch (e) {

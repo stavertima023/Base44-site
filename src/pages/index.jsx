@@ -24,6 +24,7 @@ import AdminDashboard from "./AdminDashboard";
 import AdminProducts from "./AdminProducts";
 import AdminCategories from "./AdminCategories";
 import AdminSimple from "./AdminSimple";
+import AdminProductEdit from "./AdminProductEdit";
 
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 
@@ -96,6 +97,7 @@ function PagesContent() {
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
                 <Route path="/admin/orders" element={<AdminOrders />} />
                 <Route path="/admin/products" element={<AdminProducts />} />
+                <Route path="/admin/products/edit" element={<AdminProductEdit />} />
                 <Route path="/admin/categories" element={<AdminCategories />} />
                 
             </Routes>

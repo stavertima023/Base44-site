@@ -115,18 +115,7 @@ export default function AdminProducts() {
   }
 
   const handleEdit = (product) => {
-    setEditingProduct(product)
-    setFormData({
-      title: product.title,
-      description: product.description || '',
-      price_rub: product.price_cents ? (product.price_cents / 100).toFixed(2) : '',
-      is_active: product.is_active,
-      category_id: product.category_id || '',
-      category_ids: [],
-      images: product.images || [],
-      attributes: product.attributes?.sizes ? product.attributes : { sizes: ['XS','S','M','L','XL'] }
-    })
-    setShowForm(true)
+    window.location.href = `/admin/products/edit?id=${product.id}`
   }
 
   const resetForm = () => {
