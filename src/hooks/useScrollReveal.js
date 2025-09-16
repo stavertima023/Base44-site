@@ -1,29 +1,34 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 
-export default function useScrollReveal() {
+// Ref-based reveal hook: attach to each element that should animate in
+export default function useScrollReveal(options = {}) {
+  const ref = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
+
   useEffect(() => {
-    const elements = Array.from(document.querySelectorAll(".reveal"));
-    if (elements.length === 0) return;
+    const el = ref.current;
+    if (!el) return;
 
-    const onIntersect = (entries, observer) => {
-      entries.forEach((entry) => {
+    const observer = new IntersectionObserver(
+      ([entry], obs) => {
         if (entry.isIntersecting) {
-          entry.target.classList.add("revealed");
-          observer.unobserve(entry.target);
+          setIsVisible(true);
+          obs.unobserve(entry.target);
         }
-      });
-    };
+      },
+      {
+        root: null,
+        rootMargin: "0px 0px -10% 0px",
+        threshold: 0.15,
+        ...options,
+      }
+    );
 
-    const observer = new IntersectionObserver(onIntersect, {
-      root: null,
-      rootMargin: "0px 0px -10% 0px",
-      threshold: 0.15,
-    });
-
-    elements.forEach((el) => observer.observe(el));
-
+    observer.observe(el);
     return () => observer.disconnect();
-  }, []);
+  }, [options]);
+
+  return [ref, isVisible];
 }
 
 
