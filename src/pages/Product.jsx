@@ -5,7 +5,7 @@ import { createPageUrl } from "@/utils";
 import { CartService } from "@/components/mockData";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Minus, MessageCircle, Share2 } from "lucide-react";
+import { Plus, Minus, MessageCircle, Share2, ChevronLeft, ChevronRight } from "lucide-react";
 import ProductImageModal from "@/components/ProductImageModal";
 
 // A simple card component for the recommended products
@@ -41,6 +41,7 @@ export default function ProductPage() {
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   const productId = new URLSearchParams(window.location.search).get('id');
 
@@ -56,9 +57,11 @@ export default function ProductPage() {
           description: p.description,
           price: (p.price_cents || 0) / 100,
           image_url: Array.isArray(p.images) && p.images.length ? p.images[0] : null,
+          images: Array.isArray(p.images) ? p.images : [],
           attributes: p.attributes || { sizes: ['XS','S','M','L','XL'] }
         }
         setProduct(mapped)
+        setActiveImageIndex(0)
       } catch (error) {
         console.error("Error loading product:", error)
       }
@@ -148,21 +151,70 @@ export default function ProductPage() {
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20">
-          {/* Product Image */}
+          {/* Product Images with thumbnails and arrows */}
           <div className="space-y-4">
-            <div className="aspect-square relative overflow-hidden rounded-lg bg-gray-100">
-              {product.image_url ? (
-                <img
-                  src={product.image_url}
-                  alt={product.name}
-                  className="absolute inset-0 w-full h-full object-cover cursor-zoom-in hover:scale-110 transition-transform duration-500"
-                  onClick={() => setIsImageModalOpen(true)}
-                />
-              ) : (
-                <div className="flex items-center justify-center h-full">
-                  <span className="text-gray-400 text-6xl">👕</span>
-                </div>
-              )}
+            <div className="grid grid-cols-[64px,1fr] gap-4 items-start">
+              {/* Thumbnails */}
+              <div className="flex flex-col gap-3">
+                {(product.images || []).slice(0, 2).map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setActiveImageIndex(idx)}
+                    className={`relative aspect-square w-16 overflow-hidden rounded-md border ${activeImageIndex === idx ? 'border-red-600' : 'border-gray-200 hover:border-gray-300'}`}
+                    aria-label={`Просмотреть фото ${idx + 1}`}
+                  >
+                    <img
+                      src={img}
+                      alt={`${product.name} ${idx + 1}`}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+
+              {/* Main image with arrows */}
+              <div className="aspect-square relative overflow-hidden rounded-lg bg-gray-100">
+                {product.images && product.images.length > 0 ? (
+                  <img
+                    src={product.images[activeImageIndex] || product.images[0]}
+                    alt={product.name}
+                    className="absolute inset-0 w-full h-full object-cover cursor-zoom-in transition-transform duration-500"
+                    onClick={() => setIsImageModalOpen(true)}
+                  />
+                ) : product.image_url ? (
+                  <img
+                    src={product.image_url}
+                    alt={product.name}
+                    className="absolute inset-0 w-full h-full object-cover cursor-zoom-in transition-transform duration-500"
+                    onClick={() => setIsImageModalOpen(true)}
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <span className="text-gray-400 text-6xl">👕</span>
+                  </div>
+                )}
+
+                {/* Prev */}
+                {product.images && product.images.length > 1 && (
+                  <button
+                    onClick={() => setActiveImageIndex((prev) => (prev - 1 + product.images.length) % product.images.length)}
+                    className="group absolute left-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-white/90 text-gray-800 border border-gray-200 hover:bg-red-600 hover:text-white transition-colors flex items-center justify-center"
+                    aria-label="Предыдущее фото"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                )}
+                {/* Next */}
+                {product.images && product.images.length > 1 && (
+                  <button
+                    onClick={() => setActiveImageIndex((prev) => (prev + 1) % product.images.length)}
+                    className="group absolute right-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-white/90 text-gray-800 border border-gray-200 hover:bg-red-600 hover:text-white transition-colors flex items-center justify-center"
+                    aria-label="Следующее фото"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
@@ -295,7 +347,7 @@ export default function ProductPage() {
       <ProductImageModal 
         isOpen={isImageModalOpen}
         onClose={() => setIsImageModalOpen(false)}
-        imageUrl={product.image_url}
+        imageUrl={(product.images && product.images.length > 0) ? product.images[activeImageIndex] : product.image_url}
         productName={product.name}
       />
     </div>

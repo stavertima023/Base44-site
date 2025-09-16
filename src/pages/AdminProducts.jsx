@@ -13,12 +13,15 @@ export default function AdminProducts() {
     price_rub: '',
     is_active: true,
     category_id: '',
+    category_ids: [],
     images: [],
     attributes: { sizes: ['XS','S','M','L','XL'] }
   })
   const [imageUrl, setImageUrl] = useState('')
   const [saving, setSaving] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
+  const [listCategory, setListCategory] = useState('all')
+  const [listSort, setListSort] = useState('recent')
   const navigate = useNavigate()
 
   const token = localStorage.getItem('adminToken')
@@ -37,14 +40,14 @@ export default function AdminProducts() {
 
   const fetchData = async () => {
     try {
+      const qs = new URLSearchParams()
+      if (listCategory && listCategory !== 'all') qs.set('category', listCategory)
       const [productsRes, categoriesRes] = await Promise.all([
-        fetch('/admin/products', { headers }),
+        fetch(`/admin/products?${qs.toString()}`, { headers }),
         fetch('/admin/categories', { headers })
       ])
-      
       const productsData = await productsRes.json()
       const categoriesData = await categoriesRes.json()
-      
       setProducts(productsData)
       setCategories(categoriesData)
     } catch (e) {
@@ -119,6 +122,7 @@ export default function AdminProducts() {
       price_rub: product.price_cents ? (product.price_cents / 100).toFixed(2) : '',
       is_active: product.is_active,
       category_id: product.category_id || '',
+      category_ids: [],
       images: product.images || [],
       attributes: product.attributes?.sizes ? product.attributes : { sizes: ['XS','S','M','L','XL'] }
     })
@@ -132,6 +136,7 @@ export default function AdminProducts() {
       price_rub: '',
       is_active: true,
       category_id: '',
+      category_ids: [],
       images: [],
       attributes: { sizes: ['XS','S','M','L','XL'] }
     })
@@ -159,18 +164,27 @@ export default function AdminProducts() {
 
   return (
     <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6">
         <h1 className="text-2xl font-bold">Управление товарами</h1>
-        <button
-          onClick={() => {
-            setShowForm(true)
-            setEditingProduct(null)
-            resetForm()
-          }}
-          className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
-        >
-          Добавить товар
-        </button>
+        <div className="flex items-center gap-2">
+          <select value={listCategory} onChange={(e)=>{setListCategory(e.target.value); setLoading(true);}} className="px-3 py-2 border rounded-md">
+            <option value="all">Все категории</option>
+            {categories.map(cat => (
+              <option key={cat.id} value={cat.slug}>{cat.name}</option>
+            ))}
+          </select>
+          <button onClick={fetchData} className="px-3 py-2 border rounded-md">Применить</button>
+          <button
+            onClick={() => {
+              setShowForm(true)
+              setEditingProduct(null)
+              resetForm()
+            }}
+            className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
+          >
+            Добавить товар
+          </button>
+        </div>
       </div>
 
       {showForm && (
@@ -204,7 +218,7 @@ export default function AdminProducts() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Категория</label>
+                <label className="block text-sm font-medium text-gray-700">Категория (основная)</label>
                 <select
                   value={formData.category_id}
                   onChange={(e) => setFormData(prev => ({ ...prev, category_id: e.target.value }))}
@@ -215,6 +229,27 @@ export default function AdminProducts() {
                     <option key={cat.id} value={cat.id}>{cat.name}</option>
                   ))}
                 </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Доп. категории</label>
+                <div className="mt-2 grid grid-cols-2 gap-2 max-h-28 overflow-auto border rounded-md p-2">
+                  {categories.map(cat => (
+                    <label key={cat.id} className="flex items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={formData.category_ids.includes(cat.id)}
+                        onChange={(e)=>{
+                          setFormData(prev=>{
+                            const set = new Set(prev.category_ids)
+                            if(e.target.checked) set.add(cat.id); else set.delete(cat.id)
+                            return { ...prev, category_ids: Array.from(set) }
+                          })
+                        }}
+                      />
+                      {cat.name}
+                    </label>
+                  ))}
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Статус</label>

@@ -88,15 +88,30 @@ app.get('/health', (_req, res) => {
 // (removed) simple-login endpoint
 
 // List orders
-app.get('/orders', authenticateToken, async (_req, res) => {
+app.get('/orders', authenticateToken, async (req, res) => {
   try {
+    const { category } = req.query
+    const values = []
+    let where = ''
+    if (category && category !== 'all') {
+      values.push(category)
+      // join order_items -> products -> product_categories/categories
+      where = `WHERE o.id IN (
+        SELECT oi.order_id FROM order_items oi
+        LEFT JOIN products p ON p.id = oi.product_id
+        LEFT JOIN product_categories pc ON pc.product_id = p.id
+        LEFT JOIN categories cat ON cat.id = pc.category_id OR cat.id = p.category_id
+        WHERE cat.slug = $1
+      )`
+    }
     const { rows } = await pool.query(`
       SELECT o.*, c.email AS customer_email
       FROM orders o
       LEFT JOIN customers c ON c.id = o.customer_id
+      ${where}
       ORDER BY o.created_at DESC
       LIMIT 100
-    `)
+    `, values)
     res.json(rows)
   } catch (e) {
     console.error(e)
@@ -290,12 +305,24 @@ app.delete('/admin/categories/:id', authenticateToken, async (req, res) => {
 // Products CRUD
 app.get('/admin/products', authenticateToken, async (req, res) => {
   try {
+    const { category } = req.query
+    const values = []
+    let where = ''
+    if (category && category !== 'all') {
+      values.push(category)
+      where = `WHERE p.id IN (
+        SELECT product_id FROM product_categories WHERE category_id = (SELECT id FROM categories WHERE slug = $1)
+        UNION
+        SELECT id FROM products WHERE category_id = (SELECT id FROM categories WHERE slug = $1)
+      )`
+    }
     const { rows } = await pool.query(`
       SELECT p.*, c.name as category_name 
       FROM products p 
       LEFT JOIN categories c ON c.id = p.category_id 
+      ${where}
       ORDER BY p.created_at DESC
-    `)
+    `, values)
     res.json(rows)
   } catch (e) {
     console.error(e)
@@ -316,7 +343,7 @@ app.get('/admin/products/:id', authenticateToken, async (req, res) => {
 })
 
 app.post('/admin/products', authenticateToken, async (req, res) => {
-  const { sku, title, description, price_rub, price_cents, currency, stock, is_active = true, category_id, images = [], attributes = {} } = req.body
+  const { sku, title, description, price_rub, price_cents, currency, stock, is_active = true, category_id, category_ids = [], images = [], attributes = {} } = req.body
   try {
     // Determine price in cents based on provided rubles or cents
     const finalPriceCents = Number.isFinite(Number(price_cents)) && Number(price_cents) > 0
@@ -332,12 +359,29 @@ app.post('/admin/products', authenticateToken, async (req, res) => {
     // Ensure sizes
     const finalAttributes = { sizes: ['XS', 'S', 'M', 'L', 'XL'], ...attributes }
 
-    const { rows } = await pool.query(`
-      INSERT INTO products (sku, title, description, price_cents, currency, stock, is_active, category_id, images, attributes)
-      VALUES ($1, $2, $3, $4, $5, COALESCE($6, 0), $7, $8, $9, $10)
-      RETURNING *
-    `, [finalSku, title, description, finalPriceCents, finalCurrency, null, is_active, category_id || null, JSON.stringify(images), JSON.stringify(finalAttributes)])
-    res.status(201).json(rows[0])
+    const client = await pool.connect()
+    try {
+      await client.query('BEGIN')
+      const { rows } = await client.query(`
+        INSERT INTO products (sku, title, description, price_cents, currency, stock, is_active, category_id, images, attributes)
+        VALUES ($1, $2, $3, $4, $5, COALESCE($6, 0), $7, $8, $9, $10)
+        RETURNING *
+      `, [finalSku, title, description, finalPriceCents, finalCurrency, null, is_active, category_id || null, JSON.stringify(images), JSON.stringify(finalAttributes)])
+      const created = rows[0]
+
+      // link multiple categories
+      const uniqueCategoryIds = new Set([...(category_ids || []), category_id].filter(Boolean))
+      for (const cid of uniqueCategoryIds) {
+        await client.query('INSERT INTO product_categories (product_id, category_id) VALUES ($1, $2) ON CONFLICT DO NOTHING', [created.id, cid])
+      }
+      await client.query('COMMIT')
+      res.status(201).json(created)
+    } catch (e) {
+      await client.query('ROLLBACK')
+      throw e
+    } finally {
+      client.release()
+    }
   } catch (e) {
     console.error(e)
     res.status(500).json({ error: 'Failed to create product' })
@@ -346,7 +390,7 @@ app.post('/admin/products', authenticateToken, async (req, res) => {
 
 app.put('/admin/products/:id', authenticateToken, async (req, res) => {
   const { id } = req.params
-  const { sku, title, description, price_rub, price_cents, currency, stock, is_active, category_id, images = [], attributes = {} } = req.body
+  const { sku, title, description, price_rub, price_cents, currency, stock, is_active, category_id, category_ids = [], images = [], attributes = {} } = req.body
   try {
     const finalPriceCents = Number.isFinite(Number(price_cents)) && Number(price_cents) > 0
       ? Math.round(Number(price_cents))
@@ -357,14 +401,31 @@ app.put('/admin/products/:id', authenticateToken, async (req, res) => {
       : `${slugify(title, { lower: true, strict: true })}-${nanoid(6)}`
     const finalAttributes = { sizes: ['XS', 'S', 'M', 'L', 'XL'], ...attributes }
 
-    const { rows } = await pool.query(`
-      UPDATE products 
-      SET sku = $1, title = $2, description = $3, price_cents = COALESCE($4, price_cents), currency = $5, 
-          stock = COALESCE($6, stock), is_active = $7, category_id = $8, images = $9, attributes = $10, updated_at = now()
-      WHERE id = $11
-      RETURNING *
-    `, [finalSku, title, description, finalPriceCents, finalCurrency, null, is_active, category_id || null, JSON.stringify(images), JSON.stringify(finalAttributes), id])
-    res.json(rows[0])
+    const client = await pool.connect()
+    try {
+      await client.query('BEGIN')
+      const { rows } = await client.query(`
+        UPDATE products 
+        SET sku = $1, title = $2, description = $3, price_cents = COALESCE($4, price_cents), currency = $5, 
+            stock = COALESCE($6, stock), is_active = $7, category_id = $8, images = $9, attributes = $10, updated_at = now()
+        WHERE id = $11
+        RETURNING *
+      `, [finalSku, title, description, finalPriceCents, finalCurrency, null, is_active, category_id || null, JSON.stringify(images), JSON.stringify(finalAttributes), id])
+      const updated = rows[0]
+      // reset and insert links
+      await client.query('DELETE FROM product_categories WHERE product_id = $1', [id])
+      const uniqueCategoryIds = new Set([...(category_ids || []), category_id].filter(Boolean))
+      for (const cid of uniqueCategoryIds) {
+        await client.query('INSERT INTO product_categories (product_id, category_id) VALUES ($1, $2) ON CONFLICT DO NOTHING', [id, cid])
+      }
+      await client.query('COMMIT')
+      res.json(updated)
+    } catch (e) {
+      await client.query('ROLLBACK')
+      throw e
+    } finally {
+      client.release()
+    }
   } catch (e) {
     console.error(e)
     res.status(500).json({ error: 'Failed to update product' })
@@ -376,18 +437,23 @@ app.get('/api/products', async (req, res) => {
   try {
     const { category, sort } = req.query
     const values = []
-    let where = 'WHERE is_active = true'
-    if (category) {
+    let where = 'WHERE p.is_active = true'
+    if (category && category !== 'all') {
       values.push(category)
-      where += ` AND category_id = (SELECT id FROM categories WHERE slug = $${values.length})`
+      where += ` AND (p.category_id = (SELECT id FROM categories WHERE slug = $${values.length}) OR p.id IN (
+        SELECT pc.product_id FROM product_categories pc WHERE pc.category_id = (SELECT id FROM categories WHERE slug = $${values.length})
+      ))`
     }
-    let orderBy = 'ORDER BY created_at DESC'
-    if (sort === 'alpha') {
-      orderBy = 'ORDER BY title ASC'
-    }
+
+    let orderBy = 'ORDER BY p.created_at DESC'
+    if (sort === 'alpha') orderBy = 'ORDER BY p.title ASC'
+    else if (sort === 'price_desc') orderBy = 'ORDER BY p.price_cents DESC'
+    else if (sort === 'price_asc') orderBy = 'ORDER BY p.price_cents ASC'
+    else if (sort === 'popular') orderBy = 'ORDER BY random()'
+
     const { rows } = await pool.query(`
-      SELECT id, title, price_cents, currency, images, attributes, created_at
-      FROM products
+      SELECT p.id, p.title, p.price_cents, p.currency, p.images, p.attributes, p.created_at
+      FROM products p
       ${where}
       ${orderBy}
       LIMIT 200
