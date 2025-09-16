@@ -67,7 +67,7 @@ export default function Layout({ children, currentPageName }) {
             </div>
 
             {/* Navigation */}
-            <nav className="hidden md:flex col-span-1 items-center justify-center space-x-10">
+            <nav className="hidden md:flex col-span-1 items-center justify-center space-x-10 relative z-50 pointer-events-auto">
               {navigationItems.map((item) => (
                 <Link
                   key={item.name}
@@ -84,7 +84,7 @@ export default function Layout({ children, currentPageName }) {
             </nav>
 
             {/* Right Icons */}
-            <div className="col-span-1 flex items-center justify-end space-x-5 sm:space-x-7 pr-4 sm:pr-6 lg:pr-8">
+            <div className="col-span-1 flex items-center justify-end space-x-5 sm:space-x-7 pr-4 sm:pr-6 lg:pr-8 z-10">
               <button
                 onClick={() => setIsSearchOpen(true)}
                 className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
