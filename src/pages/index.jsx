@@ -95,6 +95,7 @@ function ContactUs() {
     const [telegram, setTelegram] = React.useState("");
     const [message, setMessage] = React.useState("");
     const [sending, setSending] = React.useState(false);
+    const [sent, setSent] = React.useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -107,12 +108,12 @@ function ContactUs() {
                 body: JSON.stringify({ name, telegram, message })
             });
             if (!res.ok) throw new Error('Failed');
-            alert('Сообщение отправлено!');
+            setSent(true);
             setName("");
             setTelegram("");
             setMessage("");
         } catch (_e) {
-            alert('Не удалось отправить сообщение. Попробуйте позже.');
+            // можно отобразить скрытую ошибку при необходимости
         }
         setSending(false);
     };
@@ -140,7 +141,45 @@ function ContactUs() {
                     <button type="submit" disabled={sending} className="w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition-colors">
                         {sending ? 'Отправка...' : 'Отправить'}
                     </button>
+                    {sent && (
+                        <p className="text-green-600 text-sm">Сообщение отправлено. Мы свяжемся с вами в течение 24 часов.</p>
+                    )}
                 </form>
+            </div>
+        </div>
+    );
+}
+
+function ShippingPolicy() {
+    return (
+        <div className="min-h-screen bg-white">
+            <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <h1 className="text-2xl font-bold text-center text-gray-900 mb-8">Политика Доставки</h1>
+
+                <div className="space-y-6 text-gray-800">
+                    <div>
+                        <p className="font-semibold">Какими перевозчиками вы пользуетесь?</p>
+                        <p>Мы пользуемся услугами Яндекс доставки, Почты России, Сдэк.</p>
+                    </div>
+
+                    <div>
+                        <p className="font-semibold">Как я могу отследить свой заказ?</p>
+                        <p>После отправки заказа вы получите уведомление в телеграмм с трэк номером вашего заказа.</p>
+                    </div>
+
+                    <div>
+                        <p className="font-semibold">Сколько времени займёт доставка моего заказа?</p>
+                        <p>Для заказов внутри России: после отправки заказа доставка обычно занимает от 3 до 7 рабочих дней, в зависимости от способа доставки, выбранного при оформлении заказа. Праздничные и выходные дни не учитываются в сроке доставки.</p>
+                        <p className="mt-2">Для международных заказов: после отправки заказа доставка обычно занимает 7–20 рабочих дней. Таможня может задержать доставку вашего заказа на срок до 30 рабочих дней.</p>
+                        <p className="mt-2">Пожалуйста, имейте в виду, что это примерное время доставки, указанное нашими перевозчиками, и оно не включает время обработки заказа. Выходные, праздничные дни, таможенные процедуры и погодные условия могут привести к задержке доставки вашего заказа.</p>
+                        <p className="mt-2">Стоимость доставки не возвращается. Если ваша посылка будет возвращена из-за того, что адрес доставки не соответствует действительности, мы вернем вам деньги только за стоимость товаров. При запросе на повторную отправку взимается плата за повторную доставку. Мы не осуществляем доставку по адресу, указанному в вашем первоначальном заказе. Мы не несем ответственности за утерянные/украденные/поврежденные отправления.</p>
+                    </div>
+
+                    <div>
+                        <p className="font-semibold">Нужно ли мне будет платить международные налоги и пошлины?</p>
+                        <p>Международные заказы облагаются пошлинами, таможенными сборами и налогом на добавленную стоимость. Эти сборы ДОЛЖНЫ быть оплачены при получении заказа. Обязательно уточните у властей страны, в которую отправляется заказ, какие дополнительные расходы могут возникнуть. Вы несёте ответственность за уплату всех налогов и пошлин, взимаемых с вашей посылки; эта плата не включена в стоимость доставки.</p>
+                    </div>
+                </div>
             </div>
         </div>
     );
@@ -217,6 +256,7 @@ function PagesContent() {
                 <Route path="/register" element={<Register />} />
                 <Route path="/register/success" element={<RegisterSuccess />} />
                 <Route path="/contact-us" element={<ContactUs />} />
+                <Route path="/shipping-policy" element={<ShippingPolicy />} />
                 
                 <Route path="/admin/login" element={<AdminLogin />} />
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />

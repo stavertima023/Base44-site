@@ -142,7 +142,7 @@ export default function Layout({ children, currentPageName }) {
                 <h3 className="text-gray-900 text-sm font-semibold uppercase tracking-wider">INFORMATION</h3>
                 <ul className="mt-4 space-y-3">
                   <li><Link to="/contact-us" className="text-gray-600 hover:text-gray-900 transition-colors">Contact Us</Link></li>
-                  <li><a href="#" className="text-gray-600 hover:text-gray-900 transition-colors">Shipping & Delivery</a></li>
+                  <li><Link to="/shipping-policy" className="text-gray-600 hover:text-gray-900 transition-colors">Shipping & Delivery</Link></li>
                   <li><a href="#" className="text-gray-600 hover:text-gray-900 transition-colors">Returns / Exchanges</a></li>
                   <li><a href="#" className="text-gray-600 hover:text-gray-900 transition-colors">Search</a></li>
                 </ul>

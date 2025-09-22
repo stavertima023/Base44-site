@@ -52,16 +52,20 @@ export default function CartSidebar({ isOpen, onClose }) {
   const handleTelegramCheckout = () => {
     const itemsList = cartItems.map(item => {
       const product = mockProducts.find(p => p.id === item.product_id);
-      return `${product?.name || 'Unknown'} (${item.size}) x${item.quantity}`;
+      const name = product?.name || item.title || 'Товар';
+      const qty = item.quantity || 1;
+      const size = item.size ? ` (${item.size})` : '';
+      return `${name}${size} x${qty}`;
     }).join('\n');
-    
+
     const message = `Здравствуйте! Хочу оформить заказ:\n\n${itemsList}`;
     window.open(`https://t.me/mansionsell?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   const totalPrice = cartItems.reduce((sum, item) => {
     const product = mockProducts.find(p => p.id === item.product_id);
-    return sum + (product?.price || 0) * item.quantity;
+    const unitPriceRub = (item.price_rub != null ? item.price_rub : product?.price) || 0;
+    return sum + unitPriceRub * item.quantity;
   }, 0);
 
   if (!isOpen) return null;
@@ -177,7 +181,7 @@ export default function CartSidebar({ isOpen, onClose }) {
             <div className="border-t p-6 space-y-4">
               <div className="flex justify-between text-xl font-bold">
                 <span>Итого:</span>
-                <span>₽{Math.round(totalPrice * 90)}</span>
+                <span>₽{Math.round(totalPrice)}</span>
               </div>
               <Button
                 onClick={handleTelegramCheckout}
