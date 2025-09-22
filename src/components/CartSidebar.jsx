@@ -12,6 +12,11 @@ export default function CartSidebar({ isOpen, onClose }) {
     if (isOpen) {
       loadCartItems();
     }
+    const onCartUpdated = () => {
+      if (isOpen) loadCartItems();
+    };
+    window.addEventListener('cart-updated', onCartUpdated);
+    return () => window.removeEventListener('cart-updated', onCartUpdated);
   }, [isOpen]);
 
   const loadCartItems = async () => {
@@ -105,15 +110,17 @@ export default function CartSidebar({ isOpen, onClose }) {
               <div className="space-y-6">
                 {cartItems.map((item) => {
                   const product = mockProducts.find(p => p.id === item.product_id);
-                  if (!product) return null;
+                  const displayName = product?.name || item.title || 'Товар';
+                  const displayImage = product?.image_url || item.image_url || null;
+                  const unitPriceRub = (item.price_rub != null ? item.price_rub : product?.price) || 0;
 
                   return (
                     <div key={item.id} className="flex space-x-4 border-b pb-6">
                       <div className="w-20 h-20 relative overflow-hidden rounded-lg bg-gray-100">
-                        {product.image_url ? (
+                        {displayImage ? (
                           <img
-                            src={product.image_url}
-                            alt={product.name}
+                            src={displayImage}
+                            alt={displayName}
                             className="absolute inset-0 w-full h-full object-cover"
                           />
                         ) : (
@@ -124,7 +131,7 @@ export default function CartSidebar({ isOpen, onClose }) {
                       </div>
                       <div className="flex-1">
                         <h3 className="font-semibold text-gray-900 mb-1">
-                          {product.name}
+                          {displayName}
                         </h3>
                         <p className="text-sm text-gray-600 mb-2">
                           Размер: {item.size}
@@ -148,9 +155,7 @@ export default function CartSidebar({ isOpen, onClose }) {
                             </button>
                           </div>
                           <div className="text-right">
-                            <p className="font-semibold text-gray-900">
-                              ₽{Math.round(product.price * 90 * item.quantity)}
-                            </p>
+                            <p className="font-semibold text-gray-900">₽{Math.round(unitPriceRub * item.quantity)}</p>
                             <button
                               onClick={() => removeFromCart(item)}
                               className="text-xs text-red-600 hover:text-red-800 transition-colors"

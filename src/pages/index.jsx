@@ -1,3 +1,4 @@
+import React from "react";
 import Layout from "./Layout.jsx";
 
 import Home from "./Home";
@@ -89,6 +90,62 @@ function RegisterSuccess() {
     );
 }
 
+function ContactUs() {
+    const [name, setName] = React.useState("");
+    const [telegram, setTelegram] = React.useState("");
+    const [message, setMessage] = React.useState("");
+    const [sending, setSending] = React.useState(false);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!name || !telegram || !message) return;
+        setSending(true);
+        try {
+            const res = await fetch('/api/contact', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, telegram, message })
+            });
+            if (!res.ok) throw new Error('Failed');
+            alert('Сообщение отправлено!');
+            setName("");
+            setTelegram("");
+            setMessage("");
+        } catch (_e) {
+            alert('Не удалось отправить сообщение. Попробуйте позже.');
+        }
+        setSending(false);
+    };
+
+    return (
+        <div className="min-h-screen bg-white">
+            <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <h1 className="text-2xl font-bold text-gray-900 mb-6">Связаться с нами</h1>
+                <p className="text-gray-700 mb-6">
+                    По всем вопросам, касающимся нашего интернет-магазина и заказов, пожалуйста, обращайтесь к нам через форму ниже. Мы ответим в течение 24 часов. Обратите внимание, что на запросы, отправленные в праздничные дни и в выходные, мы ответим после возобновления рабочей недели.
+                </p>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-900 mb-1">Имя</label>
+                        <input value={name} onChange={(e) => setName(e.target.value)} className="w-full border border-gray-300 rounded-lg px-3 py-2" required />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-900 mb-1">Ник в телеграмм</label>
+                        <input value={telegram} onChange={(e) => setTelegram(e.target.value)} className="w-full border border-gray-300 rounded-lg px-3 py-2" placeholder="@username" required />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-900 mb-1">Сообщение</label>
+                        <textarea value={message} onChange={(e) => setMessage(e.target.value)} className="w-full border border-gray-300 rounded-lg px-3 py-2 h-32" required />
+                    </div>
+                    <button type="submit" disabled={sending} className="w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition-colors">
+                        {sending ? 'Отправка...' : 'Отправить'}
+                    </button>
+                </form>
+            </div>
+        </div>
+    );
+}
+
 const PAGES = {
     
     Home: Home,
@@ -128,6 +185,9 @@ function _getCurrentPage(url) {
 function PagesContent() {
     const location = useLocation();
     const currentPage = _getCurrentPage(location.pathname);
+    React.useEffect(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    }, [location.pathname]);
     
     return (
         <Layout currentPageName={currentPage}>
@@ -156,6 +216,7 @@ function PagesContent() {
                 <Route path="/Product" element={<Product />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/register/success" element={<RegisterSuccess />} />
+                <Route path="/contact-us" element={<ContactUs />} />
                 
                 <Route path="/admin/login" element={<AdminLogin />} />
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />

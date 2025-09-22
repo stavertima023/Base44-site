@@ -96,7 +96,11 @@ export default function ProductPage() {
       await CartService.create({
         product_id: productId,
         size: selectedSize,
-        quantity: quantity
+        quantity: quantity,
+        // snapshot details for rendering in cart when product not in mock list
+        title: product?.name,
+        image_url: product?.image_url || (product?.images && product.images[0]) || null,
+        price_rub: product?.price
       });
       // Emit cart-updated event for listeners (e.g., header count)
       try {
