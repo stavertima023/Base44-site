@@ -58,7 +58,6 @@ export default function AdminLogin() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500"
-              placeholder="admin@base44.com"
             />
           </div>
           <div>
@@ -71,7 +70,6 @@ export default function AdminLogin() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500"
-              placeholder="admin123"
             />
           </div>
           {error && (
@@ -85,11 +83,7 @@ export default function AdminLogin() {
             {loading ? 'Вход...' : 'Войти'}
           </button>
         </form>
-        <div className="text-center text-sm text-gray-500">
-          <p>Данные для входа:</p>
-          <p>Email: admin@base44.com</p>
-          <p>Пароль: admin123</p>
-        </div>
+        
       </div>
     </div>
   )

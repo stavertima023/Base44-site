@@ -152,7 +152,7 @@ export default function Layout({ children, currentPageName }) {
                 <ul className="mt-4 space-y-3">
                   <li><a href="#" className="text-gray-600 hover:text-gray-900 transition-colors">Terms of Service</a></li>
                   <li><a href="#" className="text-gray-600 hover:text-gray-900 transition-colors">Privacy Policy</a></li>
-                  <li><a href="#" className="text-gray-600 hover:text-gray-900 transition-colors">Refund Policy</a></li>
+                  <li><Link to="/refund-policy" className="text-gray-600 hover:text-gray-900 transition-colors">Refund Policy</Link></li>
                 </ul>
               </div>
             </div>
