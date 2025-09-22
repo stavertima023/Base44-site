@@ -5,7 +5,7 @@ export const mockProducts = [
     price: 52,
     image_url: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/da9bda531_Revenge-Your-Love-Tee-Black-02.jpeg?quality=100&width=500",
     category: "tees",
-    description: "100% Cotton. Made in USA. Available in Black and Blue. Official Product of Glo Gang.",
+    description: "100% Cotton. Made in USA. Available in Black and Blue.",
     is_featured: true
   },
   {
@@ -14,7 +14,7 @@ export const mockProducts = [
     price: 45,
     image_url: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68b6e81653b652782bf609ad/902d7d645_Worldwide-Tee-BlackBlue-01.jpeg?quality=100&width=500",
     category: "tees",
-    description: "Premium cotton t-shirt with Worldwide print design.",
+  description: "Premium cotton t-shirt with Worldwide print design.",
     is_featured: false
   },
   {

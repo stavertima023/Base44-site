@@ -9,7 +9,21 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 async function run() {
-  const databaseUrl = process.env.DATABASE_URL
+  let databaseUrl = process.env.DATABASE_URL
+  if (!databaseUrl) {
+    // Fallback: read from railway.env if present
+    try {
+      const envPath = path.resolve(__dirname, '../railway.env')
+      if (fs.existsSync(envPath)) {
+        const content = fs.readFileSync(envPath, 'utf8')
+        const match = content.split(/\r?\n/).find(line => line.trim().startsWith('DATABASE_URL='))
+        if (match) {
+          databaseUrl = match.replace('DATABASE_URL=', '').trim()
+          process.env.DATABASE_URL = databaseUrl
+        }
+      }
+    } catch {}
+  }
   if (!databaseUrl) {
     console.error('DATABASE_URL is not set')
     process.exit(1)
