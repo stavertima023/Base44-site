@@ -20,6 +20,8 @@ app.use(express.json())
 
 // Serve static files from the dist directory
 app.use(express.static(path.join(__dirname, '../dist')))
+// Also serve verification and other root static files from /public
+app.use(express.static(path.join(__dirname, '../public')))
 // Serve uploaded files
 const uploadsDir = path.join(__dirname, '../uploads')
 if (!fs.existsSync(uploadsDir)) {
