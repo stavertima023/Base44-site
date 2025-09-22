@@ -85,6 +85,36 @@ app.get('/health', (_req, res) => {
   })
 })
 
+// Telegram registration proxy
+app.post('/api/register', async (req, res) => {
+  try {
+    const { name, phone, telegram } = req.body || {}
+    if (!name || !phone || !telegram) {
+      return res.status(400).json({ error: 'Missing required fields' })
+    }
+    const botToken = process.env.TELEGRAM_BOT_TOKEN || '8127418249:AAEA498CUWa1GAqwB_0b6vqyvr5Mhn7IzDU'
+    const chatId = process.env.TELEGRAM_CHAT_ID || '7941074533'
+    const text = `Новая регистрация\nИмя: ${name}\nТелефон: ${phone}\nTelegram: ${telegram}`
+
+    const tgUrl = `https://api.telegram.org/bot${botToken}/sendMessage`
+    const payload = { chat_id: chatId, text }
+    const resp = await fetch(tgUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    const data = await resp.json()
+    if (!resp.ok || !data.ok) {
+      console.error('Telegram API error:', data)
+      return res.status(502).json({ error: 'Failed to send to Telegram' })
+    }
+    res.json({ ok: true })
+  } catch (e) {
+    console.error('Register error:', e)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
 // (removed) simple-login endpoint
 
 // List orders

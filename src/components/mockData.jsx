@@ -141,6 +141,9 @@ export const CartService = {
         const newItem = { ...item, id: Date.now().toString() };
         cart.push(newItem);
         localStorage.setItem('cart', JSON.stringify(cart));
+        try {
+          window.dispatchEvent(new CustomEvent('cart-updated'));
+        } catch (_e) {}
         resolve(newItem);
       }, 100);
     });
@@ -155,6 +158,9 @@ export const CartService = {
           cart[index] = { ...updatedItem, id };
           localStorage.setItem('cart', JSON.stringify(cart));
         }
+        try {
+          window.dispatchEvent(new CustomEvent('cart-updated'));
+        } catch (_e) {}
         resolve(cart[index]);
       }, 100);
     });
@@ -166,6 +172,9 @@ export const CartService = {
         const cart = JSON.parse(localStorage.getItem('cart') || '[]');
         const filteredCart = cart.filter(item => item.id !== id);
         localStorage.setItem('cart', JSON.stringify(filteredCart));
+        try {
+          window.dispatchEvent(new CustomEvent('cart-updated'));
+        } catch (_e) {}
         resolve(true);
       }, 100);
     });

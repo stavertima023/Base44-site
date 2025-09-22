@@ -98,7 +98,10 @@ export default function ProductPage() {
         size: selectedSize,
         quantity: quantity
       });
-      alert('Товар добавлен в корзину!');
+      // Emit cart-updated event for listeners (e.g., header count)
+      try {
+        window.dispatchEvent(new CustomEvent('cart-updated'));
+      } catch (_e) {}
     } catch (error) {
       console.error("Error adding to cart:", error);
     }

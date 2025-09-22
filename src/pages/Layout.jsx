@@ -29,6 +29,9 @@ export default function Layout({ children, currentPageName }) {
 
   useEffect(() => {
     loadCartCount();
+    const onCartUpdated = () => loadCartCount();
+    window.addEventListener('cart-updated', onCartUpdated);
+    return () => window.removeEventListener('cart-updated', onCartUpdated);
   }, []);
 
   const loadCartCount = async () => {
@@ -91,9 +94,9 @@ export default function Layout({ children, currentPageName }) {
               >
                 <Search className="h-5 w-5 text-gray-700" />
               </button>
-              <button className="hidden sm:block p-2 hover:bg-gray-50 rounded-lg transition-colors">
+              <Link to="/register" className="hidden sm:block p-2 hover:bg-gray-50 rounded-lg transition-colors">
                 <User className="h-5 w-5 text-gray-700" />
-              </button>
+              </Link>
               <button
                 onClick={() => setIsCartOpen(true)}
                 className="p-2 hover:bg-gray-50 rounded-lg transition-colors relative"

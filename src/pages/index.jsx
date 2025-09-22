@@ -28,6 +28,67 @@ import AdminProductEdit from "./AdminProductEdit";
 
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 
+function Register() {
+    const [name, setName] = React.useState("");
+    const [phone, setPhone] = React.useState("");
+    const [telegram, setTelegram] = React.useState("");
+    const [submitting, setSubmitting] = React.useState(false);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!name || !phone || !telegram) return;
+        setSubmitting(true);
+        try {
+            const res = await fetch('/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, phone, telegram })
+            });
+            if (!res.ok) throw new Error('Failed');
+            window.location.href = '/register/success';
+        } catch (_e) {
+            alert('Не удалось отправить данные. Повторите попытку позже.');
+        }
+        setSubmitting(false);
+    };
+
+    return (
+        <div className="min-h-screen bg-white">
+            <div className="max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <h1 className="text-2xl font-bold text-gray-900 mb-6">Регистрация</h1>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-900 mb-1">Имя</label>
+                        <input value={name} onChange={(e) => setName(e.target.value)} className="w-full border border-gray-300 rounded-lg px-3 py-2" required />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-900 mb-1">Номер телефона</label>
+                        <input value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full border border-gray-300 rounded-lg px-3 py-2" required />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-900 mb-1">Ник в Telegram</label>
+                        <input value={telegram} onChange={(e) => setTelegram(e.target.value)} className="w-full border border-gray-300 rounded-lg px-3 py-2" placeholder="@username" required />
+                    </div>
+                    <button type="submit" disabled={submitting} className="w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition-colors">
+                        {submitting ? 'Отправка...' : 'Зарегистрироваться'}
+                    </button>
+                </form>
+            </div>
+        </div>
+    );
+}
+
+function RegisterSuccess() {
+    return (
+        <div className="min-h-screen bg-white">
+            <div className="max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
+                <h1 className="text-2xl font-bold text-gray-900 mb-4">Ваша регистрация успешно пройдена</h1>
+                <p className="text-gray-700">Ожидайте подтверждения модератором</p>
+            </div>
+        </div>
+    );
+}
+
 const PAGES = {
     
     Home: Home,
@@ -93,6 +154,8 @@ function PagesContent() {
                 <Route path="/sale" element={<Sale />} />
                 
                 <Route path="/Product" element={<Product />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/register/success" element={<RegisterSuccess />} />
                 
                 <Route path="/admin/login" element={<AdminLogin />} />
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
